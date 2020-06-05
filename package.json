@@ -1,0 +1,31 @@
+{
+  "name": "sis-kurki-integration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "migrate:make": "knex migrate:make",
+    "migrate:latest": "knex migrate:latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversityOfHelsinkiCS/sis-kurki-integration.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UniversityOfHelsinkiCS/sis-kurki-integration/issues"
+  },
+  "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-kurki-integration#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "esm": "^3.2.25",
+    "knex": "^0.21.1",
+    "oracledb": "^4.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.1.0"
+  }
+}
