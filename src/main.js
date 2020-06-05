@@ -5,4 +5,4 @@ console.log(knexfile);
 
 const knex = Knex(knexfile);
 
-knex('dual').select('1').as('a').then(console.log).catch(console.log);
+knex.raw("SELECT table_name FROM all_tables").then(console.log).catch(console.log)

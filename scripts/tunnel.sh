@@ -1,0 +1,1 @@
+ssh -J melkki.cs.helsinki.fi -L 1521:svm-1.cs.helsinki.fi:1521 kurki.cs.helsinki.fi

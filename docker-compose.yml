@@ -1,0 +1,15 @@
+version: "3.5"
+
+services:
+  kurki-db:
+    image: store/oracle/database-enterprise:12.2.0.1
+    container_name: kurki-db
+
+  sis-kurki-integration:
+    build:
+      context: ./
+      dockerfile: config/dev.Dockerfile
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules/
+    container_name: sis-kurki-integration

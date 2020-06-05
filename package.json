@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/index.js",
+    "dev": "nodemon ./src/index.js",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest"
   },
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.1.0"
+    "eslint": "^7.1.0",
+    "nodemon": "^2.0.4"
   }
 }
