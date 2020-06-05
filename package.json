@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js",
+    "tunnel": "docker exec -it sis-kurki-integration bash /usr/src/app/scripts/tunnel.sh",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest"
   },
