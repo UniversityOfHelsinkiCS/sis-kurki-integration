@@ -1,6 +1,14 @@
-import Knex from 'knex';
+import createKnex from 'knex';
+import { knexSnakeCaseMappers } from 'objection';
+
 import knexfile from '../knexfile';
+import bindModels from './models';
 
-const knex = Knex(knexfile);
+const knex = createKnex({
+  ...knexfile,
+  ...knexSnakeCaseMappers({ upperCase: true })
+});
 
-knex.raw("select 1 as test from dual").then(console.log).catch(console.log)
+const models = bindModels(knex);
+
+models.Kurssi.query().then(console.log).catch(console.log);
