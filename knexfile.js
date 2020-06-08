@@ -11,6 +11,6 @@ module.exports = {
   connection: {
     user: KURKI_DB_USER,
     password: KURKI_DB_PASSWORD,
-    connectString: KURKI_DB_CONNECTION_STRING
+    connectString: KURKI_DB_CONNECTION_STRING,
   },
 };
