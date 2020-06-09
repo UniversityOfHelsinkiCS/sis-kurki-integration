@@ -5,6 +5,8 @@ import axios from 'axios';
 
 import bindModels from './models';
 import SisClient from './utils/sisClient';
+import createLogger from './utils/logger';
+import KurkiUpdater from './utils/kurkiUpdater';
 
 const createContext = (config) => {
   const db = createKnex({
@@ -24,10 +26,16 @@ const createContext = (config) => {
     }),
   });
 
+  const logger = createLogger();
+
+  const kurkiUpdater = new KurkiUpdater({ models, sisClient, logger });
+
   return {
     db,
     models,
     sisClient,
+    logger,
+    kurkiUpdater,
   };
 };
 

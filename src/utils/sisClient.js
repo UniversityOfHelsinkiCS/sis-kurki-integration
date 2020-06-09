@@ -5,7 +5,7 @@ class SisClient {
   }
 
   getAuthorizedRequestOptions(options) {
-    const normalizedOptions = options || {};
+    const normalizedOptions = options ? options : {};
 
     const { params } = normalizedOptions;
 

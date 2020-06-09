@@ -27,7 +27,8 @@
     "esm": "^3.2.25",
     "knex": "^0.21.1",
     "objection": "^2.1.6",
-    "oracledb": "^4.2.0"
+    "oracledb": "^4.2.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
