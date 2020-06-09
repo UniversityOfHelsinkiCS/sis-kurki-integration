@@ -8,6 +8,15 @@ import SisClient from './utils/sisClient';
 import createLogger from './utils/logger';
 import KurkiUpdater from './utils/kurkiUpdater';
 
+const createSisHttpClient = (config) => {
+  return axios.create({
+    baseURL: config.sis.apiUrl,
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false,
+    }),
+  });
+};
+
 const createContext = (config) => {
   const db = createKnex({
     ...config.kurkiDatabase,
@@ -18,12 +27,7 @@ const createContext = (config) => {
 
   const sisClient = new SisClient({
     token: config.sis.token,
-    httpClient: axios.create({
-      baseURL: config.sis.apiUrl,
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false,
-      }),
-    }),
+    httpClient: createSisHttpClient(config),
   });
 
   const logger = createLogger();

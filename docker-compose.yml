@@ -18,6 +18,8 @@ services:
       - ./:/usr/src/app
       - /usr/src/app/node_modules/
     container_name: sis-kurki-integration
+    depends_on:
+      - kurki-db
 
 volumes:
   oracle_data:
