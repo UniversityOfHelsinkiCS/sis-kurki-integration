@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-kurki-integration#readme",
   "dependencies": {
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "knex": "^0.21.1",

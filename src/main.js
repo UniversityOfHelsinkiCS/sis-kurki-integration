@@ -1,14 +1,12 @@
-import createKnex from 'knex';
-import { knexSnakeCaseMappers } from 'objection';
+import config from './config';
+import createContext from './context';
 
-import knexfile from '../knexfile';
-import bindModels from './models';
+const context = createContext(config);
 
-const knex = createKnex({
-  ...knexfile,
-  ...knexSnakeCaseMappers({ upperCase: true })
-});
-
-const models = bindModels(knex);
+const { models, sisClient } = context;
 
 models.Kurssi.query().then(console.log).catch(console.log);
+
+sisClient.getCourseUnitRealisationByCode('TKT21002')
+  .then(console.log)
+  .catch(console.log);
