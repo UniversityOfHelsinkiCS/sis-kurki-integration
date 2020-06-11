@@ -44,7 +44,7 @@ class KurkiUpdater {
       .map(({ payload }) => payload.code);
 
     this.logger.info(
-      `Attempted to update ${result.lengthh} courses. ${successCodes.length} updates succeeded and ${failureCodes.length} updates failed`,
+      `Attempted to update ${result.length} courses. ${successCodes.length} updates succeeded and ${failureCodes.length} updates failed`,
       { successCodes, failureCodes },
     );
 
