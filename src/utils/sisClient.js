@@ -1,3 +1,5 @@
+import { isArray } from 'lodash';
+
 class SisClient {
   constructor({ httpClient, token }) {
     this.httpClient = httpClient;
@@ -19,12 +21,31 @@ class SisClient {
     return this.httpClient.get(url, this.getAuthorizedRequestOptions(options));
   }
 
-  async getCourseUnitRealisationByCode(code) {
+  async getCourseUnits(options = {}) {
+    const { codes } = options;
+
+    if (!isArray(codes) || codes.length === 0) {
+      // At the moment codes array is required
+      throw new Error('At lest one course code is required');
+    }
+
+    const params = {
+      codes: codes.join(','),
+    };
+
+    const { data } = await this.getRequest('/course_units', { params });
+
+    return data;
+  }
+
+  async getCourseUnitRealisationsByCode(code) {
     if (!code) {
       throw new Error('Course code is required');
     }
 
-    const { data } = await this.getRequest('/courses', { params: { code } });
+    const { data } = await this.getRequest(
+      `/course_units/${code}/course_unit_realisations`,
+    );
 
     return data;
   }

@@ -3,10 +3,10 @@ import createContext from './context';
 
 const context = createContext(config);
 
-const { models, sisClient } = context;
+const { kurkiUpdater, logger } = context;
 
-models.Kurssi.query().then(console.log).catch(console.log);
-
-sisClient.getCourseUnitRealisationByCode('TKT21002')
-  .then(console.log)
-  .catch(console.log);
+kurkiUpdater
+  .updateCourseUnits({
+    codes: ['TKT21002'],
+  })
+  .catch((error) => logger.error(error));
