@@ -1,6 +1,7 @@
 import promiseMap from 'p-map';
 
 import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
+import getDistinctCourseUnits from './getDistinctCourseUnits';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger }) {
@@ -12,9 +13,11 @@ class KurkiUpdater {
   async updateCourseUnits(options = {}) {
     const { codes } = options;
 
-    const courseUnits = await this.sisClient.getCourseUnits({
+    const allCourseUnits = await this.sisClient.getCourseUnits({
       codes,
     });
+
+    const courseUnits = getDistinctCourseUnits(allCourseUnits);
 
     const result = await promiseMap(
       courseUnits,

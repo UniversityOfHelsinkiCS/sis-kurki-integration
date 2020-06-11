@@ -43,9 +43,9 @@ class SisClient {
       throw new Error('Course code is required');
     }
 
-    const { data } = await this.getRequest(
-      `/course_units/${code}/course_unit_realisations`,
-    );
+    const { data } = await this.getRequest(`/course_unit_realisations`, {
+      params: { code },
+    });
 
     return data;
   }
