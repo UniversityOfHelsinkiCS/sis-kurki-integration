@@ -45,7 +45,7 @@ const getKielikoodiByTeachingLanguageUrn = (teachingLanguageUrn) => {
     se: 'R',
   };
 
-  return mapping[language];
+  return mapping[language] || 'E';
 };
 
 const getKurssiByCourseUnitRealisation = (

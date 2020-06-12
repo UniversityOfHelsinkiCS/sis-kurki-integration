@@ -1,6 +1,5 @@
 import https from 'https';
 import createKnex from 'knex';
-import { knexSnakeCaseMappers } from 'objection';
 import axios from 'axios';
 
 import bindModels from './models';
@@ -18,10 +17,7 @@ const createSisHttpClient = (config) => {
 };
 
 const createContext = (config) => {
-  const db = createKnex({
-    ...config.kurkiDatabase,
-    ...knexSnakeCaseMappers({ upperCase: true }),
-  });
+  const db = createKnex(config.kurkiDatabase);
 
   const models = bindModels(db);
 

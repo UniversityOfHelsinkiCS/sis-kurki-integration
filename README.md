@@ -10,7 +10,21 @@ KURKI_DB_PASSWORD=oracle
 KURKI_DB_CONNECTION_STRING=host.docker.internal:1521/xe
 ```
 
-2. Build the docker image by running `docker-compose up --build`
+You will need to request the value of the `SIS_API_TOKEN` from Toska. `SIS_API_URL` can be configured like this:
+
+```
+SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
+```
+
+2. Build the docker image by running `docker-compose up --build`.
+
+3. Once database is running (indicated by log message `Database ready to use. Enjoy! ;)` in the `kurki-db` container), connect to the `sis-kurki-integration` container:
+
+```
+docker exec -it sis-kurki-integration /bin/bash
+```
+
+Once connected to the container, run the `npm run migrate:latest` script followed by the `npm run seed:run` script.
 
 ---
 
@@ -32,18 +46,19 @@ And run the following command:
 ALTER SYSTEM DISABLE RESTRICTED SESSION;
 ```
 
-## Connecting to the production database
+## Running tests
 
-1. Set correct database configuration in the `.env` file 
-2. When running, start the tunnel with `npm run tunnel`
+1. Build the docker image by running `docker-compose up --build`.
 
-## Running migrations in development environment
-
-1. Build the docker image by running `docker-compose up --build`
-2. Once database is running, connect to the `sis-kurki-integration` container: 
+2. Connect to the `sis-kurki-integration` container:
 
 ```
 docker exec -it sis-kurki-integration /bin/bash
 ```
 
-3. Once connected to the container, run the `npm run migrate:latest` script
+3. Once connected to the container, run the `npm test` script.
+
+## Connecting to the production database
+
+1. Set correct database configuration in the `.env` file.
+2. When running, start the tunnel with `npm run tunnel`.

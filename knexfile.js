@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const { knexSnakeCaseMappers } = require('objection');
+
 const {
   KURKI_DB_USER,
   KURKI_DB_PASSWORD,
@@ -13,4 +15,5 @@ module.exports = {
     password: KURKI_DB_PASSWORD,
     connectString: KURKI_DB_CONNECTION_STRING,
   },
+  ...knexSnakeCaseMappers({ upperCase: true }),
 };
