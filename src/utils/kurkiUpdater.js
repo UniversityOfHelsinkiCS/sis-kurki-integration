@@ -53,7 +53,7 @@ class KurkiUpdater {
       opintojakso,
     );
 
-    await this.updateCourseUnitRealisations(courseUnit);
+    //await this.updateCourseUnitRealisations(courseUnit);
   }
 
   async updateCourseUnitRealisations(courseUnit) {

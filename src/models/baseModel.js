@@ -1,16 +1,18 @@
-import { Model, QueryBuilder } from 'objection';
+import { Model, QueryBuilder, transaction } from 'objection';
 
 class EnhancedQueryBuilder extends QueryBuilder {
-  async patchOrInsertById(id, data) {
-    const nrUpdated = await this.clone().findById(id).patch(data);
+  patchOrInsertById(id, data) {
+    return transaction(this.modelClass(), async (Model) => {
+      const nrUpdated = await Model.query().findById(id).patch(data);
 
-    if (nrUpdated === 1) {
-      return true;
-    } else {
-      await this.clone().insert(data);
+      if (nrUpdated === 1) {
+        return true;
+      } else {
+        await Model.query().insert(data);
 
-      return false;
-    }
+        return false;
+      }
+    });
   }
 }
 
