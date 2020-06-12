@@ -1,4 +1,4 @@
-import get from 'lodash/get';
+import { get } from 'lodash';
 import { getYear, isValid, getMonth, getDate } from 'date-fns';
 
 const kielikoodiByLanguageCode = {
@@ -65,7 +65,7 @@ const getKielikoodiByTeachingLanguageUrn = (teachingLanguageUrn) => {
   const parts = teachingLanguageUrn.split(':');
   const language = parts[parts.length - 1];
 
-  return kielikoodiByLanguageCode[language];
+  return kielikoodiByLanguageCode[language] || 'E';
 };
 
 const getTyyppiByCourseUnitRealisationTypeUrn = (
@@ -78,7 +78,7 @@ const getTyyppiByCourseUnitRealisationTypeUrn = (
   const parts = courseUnitRealisationTypeUrn.split(':');
   const type = parts[parts.length - 1];
 
-  return tyyppiByCourseUnitRealisationType[type];
+  return tyyppiByCourseUnitRealisationType[type] || 'K';
 };
 
 const getKurssiByCourseUnitRealisation = (
@@ -90,6 +90,7 @@ const getKurssiByCourseUnitRealisation = (
     teachingLanguageUrn,
     courseUnitRealisationTypeUrn,
   } = courseUnitRealisation;
+
   const { code } = courseUnit;
   const startDate = get(activityPeriod, 'startDate');
 
