@@ -1,6 +1,32 @@
 import get from 'lodash/get';
 import { getYear, isValid, getMonth, getDate } from 'date-fns';
 
+const kielikoodiByLanguageCode = {
+  fi: 'S',
+  en: 'E',
+  se: 'R',
+};
+
+const tyyppiByCourseUnitRealisationType = {
+  'independent-work-essay': 'K',
+  'exam-electronic': 'L',
+  'exam-final': 'L',
+  'teaching-participation-field-course': 'K',
+  'teaching-participation-small-group': 'K',
+  'independent-work-project': 'A',
+  'teaching-participation-seminar': 'S',
+  'thesis-doctoral': 'Y',
+  'licentiate-thesis': 'Y',
+  'independent-work-presentation': 'K',
+  'training-training': 'K',
+  'exam-exam': 'L',
+  'teaching-participation-lab': 'A',
+  'exam-midterm': 'L',
+  'independent-work-learning-diary': 'K',
+  'teaching-participation-lectures': 'K',
+  'teaching-participation-online': 'K',
+};
+
 const getLukuvuosi = (dateLike) => {
   const date = new Date(dateLike);
 
@@ -39,20 +65,31 @@ const getKielikoodiByTeachingLanguageUrn = (teachingLanguageUrn) => {
   const parts = teachingLanguageUrn.split(':');
   const language = parts[parts.length - 1];
 
-  const mapping = {
-    fi: 'S',
-    en: 'E',
-    se: 'R',
-  };
+  return kielikoodiByLanguageCode[language];
+};
 
-  return mapping[language] || 'E';
+const getTyyppiByCourseUnitRealisationTypeUrn = (
+  courseUnitRealisationTypeUrn,
+) => {
+  if (!courseUnitRealisationTypeUrn) {
+    return undefined;
+  }
+
+  const parts = courseUnitRealisationTypeUrn.split(':');
+  const type = parts[parts.length - 1];
+
+  return tyyppiByCourseUnitRealisationType[type];
 };
 
 const getKurssiByCourseUnitRealisation = (
   courseUnitRealisation,
   courseUnit,
 ) => {
-  const { activityPeriod, teachingLanguageUrn } = courseUnitRealisation;
+  const {
+    activityPeriod,
+    teachingLanguageUrn,
+    courseUnitRealisationTypeUrn,
+  } = courseUnitRealisation;
   const { code } = courseUnit;
   const startDate = get(activityPeriod, 'startDate');
 
@@ -60,7 +97,9 @@ const getKurssiByCourseUnitRealisation = (
     kurssikoodi: code,
     lukuvuosi: getLukuvuosi(startDate),
     lukukausi: getLukukausi(startDate),
-    tyyppi: 'L',
+    tyyppi: getTyyppiByCourseUnitRealisationTypeUrn(
+      courseUnitRealisationTypeUrn,
+    ),
     kurssiNro: 1,
     kielikoodi: getKielikoodiByTeachingLanguageUrn(teachingLanguageUrn),
     opintoviikot: 1,

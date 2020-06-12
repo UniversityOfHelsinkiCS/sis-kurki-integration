@@ -18,7 +18,7 @@ SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
 
 2. Build the docker image by running `docker-compose up --build`.
 
-3. Once database is running (indicated by log message `Database ready to use. Enjoy! ;)` in the `kurki-db` container), connect to the `sis-kurki-integration` container:
+3. Once database is running (indicated by the log message `Database ready to use. Enjoy! ;)` in the `kurki-db` container), connect to the `sis-kurki-integration` container:
 
 ```
 docker exec -it sis-kurki-integration /bin/bash
