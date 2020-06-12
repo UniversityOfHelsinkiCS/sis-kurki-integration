@@ -2,6 +2,7 @@ import promiseMap from 'p-map';
 
 import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 import getDistinctCourseUnits from './getDistinctCourseUnits';
+import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger }) {
@@ -18,48 +19,81 @@ class KurkiUpdater {
     });
 
     const courseUnits = getDistinctCourseUnits(allCourseUnits);
+    const courseUnitCodes = courseUnits.map(({ code }) => code);
 
-    const result = await promiseMap(
+    this.logger.info(`Starting to update ${courseUnits.length} courses`, {
+      courseUnitCodes,
+    });
+
+    await promiseMap(
       courseUnits,
-      async (courseUnit) => {
-        try {
-          await this.updateCourseUnit(courseUnit);
+      (courseUnit) => {
+        return this.updateCourseUnit(courseUnit).catch((error) => {
+          this.logger.error('Failed to update course unit', {
+            courseUnit,
+          });
 
-          return {
-            payload: courseUnit,
-            error: null,
-          };
-        } catch (error) {
-          this.logger.error(error, { courseUnit });
-
-          return { payload: courseUnit, error };
-        }
+          this.logger.error(error);
+        });
       },
-      { concurrency: 1 },
+      { concurrency: 1, stopOnError: false },
     );
-
-    const successCodes = result
-      .filter(({ error }) => !error)
-      .map(({ payload }) => payload.code);
-
-    const failureCodes = result
-      .filter(({ error }) => error)
-      .map(({ payload }) => payload.code);
 
     this.logger.info(
-      `Attempted to update ${result.length} courses. ${successCodes.length} updates succeeded and ${failureCodes.length} updates failed`,
-      { successCodes, failureCodes },
+      `Done updating ${courseUnits.length} courses. Check logs for possible errors`,
+      { courseUnitCodes },
     );
-
-    return result;
   }
 
   async updateCourseUnit(courseUnit) {
-    const { code } = courseUnit;
-
     const opintojakso = getOpintojaksoByCourseUnit(courseUnit);
 
-    await this.models.Opintojakso.query().patchOrInsertById(code, opintojakso);
+    await this.models.Opintojakso.query().patchOrInsertById(
+      courseUnit.code,
+      opintojakso,
+    );
+
+    await this.updateCourseUnitRealisations(courseUnit);
+  }
+
+  async updateCourseUnitRealisations(courseUnit) {
+    const courseUnitRealisations = await this.sisClient.getCourseUnitRealisationsByCode(
+      courseUnit.code,
+    );
+
+    await promiseMap(
+      courseUnitRealisations,
+      (realisation) => {
+        return this.updateCourseUnitRealisation(realisation, courseUnit).catch(
+          (error) => {
+            this.logger.error('Failed to update course unit realisation', {
+              courseUnit,
+              courseUnitRealisation: realisation,
+            });
+
+            this.logger.error(error);
+          },
+        );
+      },
+      { concurrency: 10, stopOnError: false },
+    );
+  }
+
+  async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
+    const kurssi = getKurssiByCourseUnitRealisation(
+      courseUnitRealisation,
+      courseUnit,
+    );
+
+    const id = [
+      kurssi.kurssikoodi,
+      kurssi.lukukausi,
+      kurssi.lukuvuosi,
+      kurssi.tyyppi,
+      kurssi.kurssiNro,
+    ];
+
+    await this.models.Kurssi.query().patchOrInsertById(id, kurssi);
   }
 }
 

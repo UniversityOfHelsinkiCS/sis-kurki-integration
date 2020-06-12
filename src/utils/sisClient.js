@@ -26,7 +26,7 @@ class SisClient {
 
     if (!isArray(codes) || codes.length === 0) {
       // At the moment codes array is required
-      throw new Error('At lest one course code is required');
+      throw new Error('At least one course code is required');
     }
 
     const params = {

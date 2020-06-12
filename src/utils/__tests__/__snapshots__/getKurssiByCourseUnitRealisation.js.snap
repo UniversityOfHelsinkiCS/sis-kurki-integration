@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getKurssiByCourseUnitRealisation returns correct kurssi given course unit realisation 1`] = `
+Object {
+  "kielikoodi": "E",
+  "kurssiNro": 1,
+  "kurssikoodi": "TKT21002",
+  "lukukausi": "S",
+  "lukuvuosi": 2017,
+  "nimi": "Introduction to Game Programming",
+  "opintoviikot": 1,
+  "tyyppi": "L",
+}
+`;

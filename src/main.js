@@ -3,7 +3,7 @@ import createContext from './context';
 
 const context = createContext(config);
 
-const { kurkiUpdater, logger } = context;
+const { kurkiUpdater, logger, models } = context;
 
 kurkiUpdater
   .updateCourseUnits({

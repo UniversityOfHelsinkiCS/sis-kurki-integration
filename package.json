@@ -6,10 +6,16 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js",
+    "test": "jest src",
     "tunnel": "docker exec -it sis-kurki-integration bash /usr/src/app/scripts/tunnel.sh",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
   },
   "repository": {
     "type": "git",
@@ -23,6 +29,7 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/sis-kurki-integration#readme",
   "dependencies": {
     "axios": "^0.19.2",
+    "date-fns": "^2.14.0",
     "dotenv": "^8.2.0",
     "esm": "^3.2.25",
     "knex": "^0.21.1",
@@ -33,8 +40,13 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
     "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.0.1",
     "eslint": "^7.1.0",
+    "eslint-plugin-jest": "^23.13.2",
+    "jest": "^26.0.1",
     "nodemon": "^2.0.4"
   }
 }
