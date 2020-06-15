@@ -17,7 +17,7 @@ const createSisHttpClient = (config) => {
 };
 
 const createContext = (config) => {
-  const db = createKnex(config.kurkiDatabase);
+  const db = createKnex(config.kurki.db);
 
   const models = bindModels(db);
 
