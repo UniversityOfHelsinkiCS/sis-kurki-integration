@@ -27,6 +27,12 @@ const tyyppiByCourseUnitRealisationType = {
   'teaching-participation-online': 'K',
 };
 
+const tilaByFlowState = {
+  PUBLISHED: 'I',
+  CANCELLED: 'J',
+  NOT_READY: 'O',
+};
+
 const getLukuvuosi = (dateLike) => {
   const date = new Date(dateLike);
 
@@ -81,6 +87,14 @@ const getTyyppiByCourseUnitRealisationTypeUrn = (
   return tyyppiByCourseUnitRealisationType[type] || 'K';
 };
 
+const getTilaByFlowState = (flowState) => {
+  if (!flowState) {
+    return undefined;
+  }
+
+  return tilaByFlowState[flowState] || 'O';
+};
+
 const getKurssiByCourseUnitRealisation = (
   courseUnitRealisation,
   courseUnit,
@@ -89,6 +103,7 @@ const getKurssiByCourseUnitRealisation = (
     activityPeriod,
     teachingLanguageUrn,
     courseUnitRealisationTypeUrn,
+    flowState,
   } = courseUnitRealisation;
 
   const { code } = courseUnit;
@@ -104,7 +119,8 @@ const getKurssiByCourseUnitRealisation = (
     kurssiNro: 1,
     kielikoodi: getKielikoodiByTeachingLanguageUrn(teachingLanguageUrn),
     opintoviikot: 1,
-    nimi: get(courseUnit, 'name.fi'),
+    nimi: get(courseUnitRealisation, 'name.fi'),
+    tila: getTilaByFlowState(flowState),
   };
 };
 
