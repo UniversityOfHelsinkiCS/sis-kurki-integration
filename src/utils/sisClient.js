@@ -38,6 +38,20 @@ class SisClient {
     return data;
   }
 
+  getCourseUnitsByCodes(codes) {
+    return this.getCourseUnits({ codes });
+  }
+
+  async getCourseUnitsByProgramme(programme) {
+    if (!programme) {
+      throw new Error('Programme is required');
+    }
+
+    const { data } = await this.getRequest(`/course_units/${programme}`);
+
+    return data && data.course_units ? data.course_units : [];
+  }
+
   async getCourseUnitRealisationsByCode(code) {
     if (!code) {
       throw new Error('Course code is required');

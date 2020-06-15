@@ -11,14 +11,24 @@ class KurkiUpdater {
     this.logger = logger;
   }
 
-  async updateCourseUnits(options = {}) {
-    const { codes } = options;
+  async updateCourseUnitsByCodes(codes) {
+    const allCourseUnits = await this.sisClient.getCourseUnitsByCodes(codes);
+    const courseUnits = getDistinctCourseUnits(allCourseUnits);
 
-    const allCourseUnits = await this.sisClient.getCourseUnits({
-      codes,
-    });
+    return this.updateCourseUnits(courseUnits);
+  }
+
+  async updateCourseUnitsByProgamme(programme) {
+    const allCourseUnits = await this.sisClient.getCourseUnitsByProgramme(
+      programme,
+    );
 
     const courseUnits = getDistinctCourseUnits(allCourseUnits);
+
+    return this.updateCourseUnits(courseUnits);
+  }
+
+  async updateCourseUnits(courseUnits) {
     const courseUnitCodes = courseUnits.map(({ code }) => code);
 
     this.logger.info(`Starting to update ${courseUnits.length} courses`, {

@@ -3,10 +3,8 @@ import createContext from './context';
 
 const context = createContext(config);
 
-const { kurkiUpdater, logger, models } = context;
+const { kurkiUpdater, logger } = context;
 
 kurkiUpdater
-  .updateCourseUnits({
-    codes: ['TKT21002'],
-  })
+  .updateCourseUnitsByCodes(['TKT21002'])
   .catch((error) => logger.error(error));
