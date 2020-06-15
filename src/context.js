@@ -28,7 +28,12 @@ const createContext = (config) => {
 
   const logger = createLogger();
 
-  const kurkiUpdater = new KurkiUpdater({ models, sisClient, logger });
+  const kurkiUpdater = new KurkiUpdater({
+    models,
+    sisClient,
+    logger,
+    fallbackKurssiOmistaja: config.kurki.fallbackKurssiOmistaja,
+  });
 
   return {
     db,

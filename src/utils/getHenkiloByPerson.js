@@ -8,6 +8,8 @@ const getHenkiloByPerson = (person) => {
     etunimet: firstName,
     sukunimi: lastName,
     sahkopostiosoite: emailAddress,
+    hyPuhelinluettelossa: 'E', // TODO: This shouldn't be hard coded
+    hyTyosuhde: 'K', // TODO: This shouldn't be hard coded
   };
 };
 

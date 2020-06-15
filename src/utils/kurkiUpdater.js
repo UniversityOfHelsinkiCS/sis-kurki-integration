@@ -3,12 +3,15 @@ import promiseMap from 'p-map';
 import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 import getDistinctCourseUnits from './getDistinctCourseUnits';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
+import getCourseUnitRealisationOwner from './getCourseUnitRealisationOwner';
+import getHenkiloByPerson from './getHenkiloByPerson';
 
 class KurkiUpdater {
-  constructor({ models, sisClient, logger }) {
+  constructor({ models, sisClient, logger, fallbackKurssiOmistaja }) {
     this.models = models;
     this.sisClient = sisClient;
     this.logger = logger;
+    this.fallbackKurssiOmistaja = fallbackKurssiOmistaja;
   }
 
   async updateCourseUnitsByCodes(codes) {
@@ -63,7 +66,7 @@ class KurkiUpdater {
       opintojakso,
     );
 
-    //await this.updateCourseUnitRealisations(courseUnit);
+    await this.updateCourseUnitRealisations(courseUnit);
   }
 
   async updateCourseUnitRealisations(courseUnit) {
@@ -90,10 +93,27 @@ class KurkiUpdater {
   }
 
   async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
-    const kurssi = getKurssiByCourseUnitRealisation(
+    const owner = getCourseUnitRealisationOwner(courseUnit);
+    const ownerHenkilo = owner ? getHenkiloByPerson(owner) : undefined;
+
+    if (ownerHenkilo) {
+      await this.models.Henkilo.query().patchOrInsertById(
+        ownerHenkilo.htunnus,
+        ownerHenkilo,
+      );
+    }
+
+    const baseKurssi = getKurssiByCourseUnitRealisation(
       courseUnitRealisation,
       courseUnit,
     );
+
+    const kurssi = {
+      ...baseKurssi,
+      omistaja: ownerHenkilo
+        ? ownerHenkilo.htunnus
+        : this.fallbackKurssiOmistaja,
+    };
 
     const id = [
       kurssi.kurssikoodi,

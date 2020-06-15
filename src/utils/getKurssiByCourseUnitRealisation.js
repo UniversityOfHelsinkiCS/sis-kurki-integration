@@ -117,9 +117,9 @@ const getKurssiByCourseUnitRealisation = (
     tyyppi: getTyyppiByCourseUnitRealisationTypeUrn(
       courseUnitRealisationTypeUrn,
     ),
-    kurssiNro: 1,
+    kurssiNro: 1, // TODO: This shouldn't be hard coded
     kielikoodi: getKielikoodiByTeachingLanguageUrn(teachingLanguageUrn),
-    opintoviikot: 1,
+    opintoviikot: 1, // TODO: This shouldn't be hard coded
     nimi: get(name, 'fi'),
     tila: getTilaByFlowState(flowState),
   };

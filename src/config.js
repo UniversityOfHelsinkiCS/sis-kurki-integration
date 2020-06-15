@@ -7,13 +7,13 @@ import knexfile from '../knexfile';
 const {
   SIS_API_URL,
   SIS_API_TOKEN,
-  KURKI_FALLBACK_KURSSI_OMISTAJA_HTUNNUS,
+  KURKI_FALLBACK_KURSSI_OMISTAJA,
 } = process.env;
 
 export default {
   kurki: {
     db: knexfile,
-    fallbackKurssiOmistajaHtunnus: KURKI_FALLBACK_KURSSI_OMISTAJA_HTUNNUS,
+    fallbackKurssiOmistaja: KURKI_FALLBACK_KURSSI_OMISTAJA,
   },
   sis: {
     apiUrl: SIS_API_URL,

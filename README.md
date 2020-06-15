@@ -2,19 +2,18 @@
 
 ## Development setup
 
-1. Create a `.env` file in the root directory with contents of the `.env.template` file. Replace the `KURKI_DB_*` environment variables values with the database connection configuration. These variables are suitable for the development database:
+1. Create a `.env` file in the root directory with contents of the `.env.template` file. Here is a suitable configuration for development purposes: 
 
 ```
 KURKI_DB_USER=system
 KURKI_DB_PASSWORD=oracle
 KURKI_DB_CONNECTION_STRING=kurki-db:1521/xe
-```
-
-You will need to request the value of the `SIS_API_TOKEN` from Toska. `SIS_API_URL` can be configured like this:
-
-```
+KURKI_FALLBACK_KURSSI_OMISTAJA=DOE_J
+SIS_API_TOKEN=<SIS_API_TOKEN>
 SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
 ```
+
+You will need to request the value of the `SIS_API_TOKEN` from Toska to be able to finish the development setup.
 
 2. Build the docker image by running `docker-compose up --build`.
 
