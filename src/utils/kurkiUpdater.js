@@ -4,7 +4,7 @@ import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 import getDistinctCourseUnits from './getDistinctCourseUnits';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getCourseUnitRealisationOwner from './getCourseUnitRealisationOwner';
-import getHenkiloByPerson from './getHenkiloByPerson';
+import getHtunnusByFullName from './getHtunnusByFullName';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger, fallbackKurssiOmistaja }) {
@@ -94,14 +94,17 @@ class KurkiUpdater {
 
   async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
     const owner = getCourseUnitRealisationOwner(courseUnit);
-    const ownerHenkilo = owner ? getHenkiloByPerson(owner) : undefined;
 
-    if (ownerHenkilo) {
-      await this.models.Henkilo.query().patchOrInsertById(
-        ownerHenkilo.htunnus,
-        ownerHenkilo,
-      );
-    }
+    const ownerHtunnus = owner
+      ? getHtunnusByFullName({
+          firstName: owner.firstName,
+          lastName: owner.lastName,
+        })
+      : undefined;
+
+    const ownerHenkilo = ownerHtunnus
+      ? await this.models.Henkilo.query().findById(ownerHtunnus)
+      : undefined;
 
     const baseKurssi = getKurssiByCourseUnitRealisation(
       courseUnitRealisation,
