@@ -104,6 +104,7 @@ const getKurssiByCourseUnitRealisation = (
     teachingLanguageUrn,
     courseUnitRealisationTypeUrn,
     flowState,
+    name,
   } = courseUnitRealisation;
 
   const { code } = courseUnit;
@@ -119,7 +120,7 @@ const getKurssiByCourseUnitRealisation = (
     kurssiNro: 1,
     kielikoodi: getKielikoodiByTeachingLanguageUrn(teachingLanguageUrn),
     opintoviikot: 1,
-    nimi: get(courseUnitRealisation, 'name.fi'),
+    nimi: get(name, 'fi'),
     tila: getTilaByFlowState(flowState),
   };
 };

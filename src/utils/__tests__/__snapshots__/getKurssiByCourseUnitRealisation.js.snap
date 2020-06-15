@@ -9,6 +9,7 @@ Object {
   "lukuvuosi": 2017,
   "nimi": "Introduction to Game Programming",
   "opintoviikot": 1,
-  "tyyppi": "L",
+  "tila": "I",
+  "tyyppi": "K",
 }
 `;
