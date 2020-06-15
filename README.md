@@ -7,7 +7,7 @@
 ```
 KURKI_DB_USER=system
 KURKI_DB_PASSWORD=oracle
-KURKI_DB_CONNECTION_STRING=host.docker.internal:1521/xe
+KURKI_DB_CONNECTION_STRING=kurki-db:1521/xe
 ```
 
 You will need to request the value of the `SIS_API_TOKEN` from Toska. `SIS_API_URL` can be configured like this:
