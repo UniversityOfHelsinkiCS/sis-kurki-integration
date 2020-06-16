@@ -45,6 +45,9 @@ And run the following command:
 ALTER SYSTEM DISABLE RESTRICTED SESSION;
 ```
 
+When you want to install new npm packages, since project has to have packages installed inside the container use 
+`npm run install axios` or if you need to reinstall package.json use `npm run build`.
+
 ## Running tests
 
 1. Build the docker image by running `docker-compose up --build`.
