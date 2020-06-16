@@ -93,6 +93,10 @@ class KurkiUpdater {
   }
 
   async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
+    const courseUnitRealisationLogPayload = {
+      courseUnitRealisationId: courseUnitRealisation.id,
+    };
+
     const owner = getCourseUnitRealisationOwner(courseUnit);
 
     const ownerHtunnus = owner
@@ -105,6 +109,18 @@ class KurkiUpdater {
     const ownerHenkilo = ownerHtunnus
       ? await this.models.Henkilo.query().findById(ownerHtunnus)
       : undefined;
+
+    if (!ownerHtunnus) {
+      this.logger.info(
+        `Course unit realisation's responsibility information is not found. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
+        courseUnitRealisationLogPayload,
+      );
+    } else if (!ownerHenkilo) {
+      this.logger.info(
+        `Could not find person with person id ${ownerHtunnus}. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
+        courseUnitRealisationLogPayload,
+      );
+    }
 
     const baseKurssi = getKurssiByCourseUnitRealisation(
       courseUnitRealisation,
