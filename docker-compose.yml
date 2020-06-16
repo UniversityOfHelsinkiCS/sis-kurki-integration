@@ -2,12 +2,16 @@ version: "3.5"
 
 services:
   kurki-db:
-    image: truevoly/oracle-12c
+    image: banglamon/oracle193db:19.3.0-ee
     ports:
       - "8080:8080"
       - "1521:1521"
+    environment:
+      ORACLE_SID: xe
+      ORACLE_PBD: system # WTF PBD??
+      ORACLE_PWD: oracle
     volumes:
-      - oracle_data:/u01/app/oracle
+      - oracle_data:/opt/oracle/oradata
     container_name: kurki-db
 
   sis-kurki-integration:
