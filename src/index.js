@@ -1,3 +1,10 @@
-// eslint-disable-next-line no-global-assign
-require = require('esm')(module);
-module.exports = require('./main.js');
+import config from './config';
+import createContext from './context';
+
+const context = createContext(config);
+
+const { kurkiUpdater, logger } = context;
+
+kurkiUpdater
+  .updateCourseUnitsByCodes(['TKT21002'])
+  .catch((error) => logger.error(error));
