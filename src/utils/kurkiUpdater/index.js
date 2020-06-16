@@ -97,7 +97,11 @@ class KurkiUpdater {
       courseUnitRealisationId: courseUnitRealisation.id,
     };
 
-    const owner = getCourseUnitRealisationOwner(courseUnit);
+    const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
+      courseUnitRealisation.id,
+    );
+
+    const owner = getCourseUnitRealisationOwner(responsibilityInfos);
 
     const ownerHtunnus = owner
       ? getHtunnusByFullName({
