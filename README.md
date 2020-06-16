@@ -2,7 +2,7 @@
 
 ## Development setup
 
-1. Create a `.env` file in the root directory with contents of the `.env.template` file. Here is a suitable configuration for development purposes: 
+1. Create a `.env` file in the root directory with contents of the `.env.template` file. Here is a suitable configuration for development purposes:
 
 ```
 KURKI_DB_USER=system
@@ -61,3 +61,7 @@ docker exec -it sis-kurki-integration /bin/bash
 
 1. Set correct database configuration in the `.env` file.
 2. When running, start the tunnel with `npm run tunnel`.
+
+## Todo
+
+- Add `sisId` for `Kurssi` table in Kurki.

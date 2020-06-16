@@ -79,10 +79,7 @@ class KurkiUpdater {
       (realisation) => {
         return this.updateCourseUnitRealisation(realisation, courseUnit).catch(
           (error) => {
-            this.logger.error('Failed to update course unit realisation', {
-              courseUnit,
-              courseUnitRealisation: realisation,
-            });
+            this.logger.error('Failed to update course unit realisation');
 
             this.logger.error(error);
           },
@@ -97,9 +94,11 @@ class KurkiUpdater {
       courseUnitRealisationId: courseUnitRealisation.id,
     };
 
-    const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
+    /*const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
       courseUnitRealisation.id,
-    );
+    );*/
+
+    const responsibilityInfos = [];
 
     const owner = getCourseUnitRealisationOwner(responsibilityInfos);
 
@@ -138,15 +137,7 @@ class KurkiUpdater {
         : this.fallbackKurssiOmistaja,
     };
 
-    const id = [
-      kurssi.kurssikoodi,
-      kurssi.lukukausi,
-      kurssi.lukuvuosi,
-      kurssi.tyyppi,
-      kurssi.kurssiNro,
-    ];
-
-    await this.models.Kurssi.query().patchOrInsertById(id, kurssi);
+    await this.models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
   }
 }
 

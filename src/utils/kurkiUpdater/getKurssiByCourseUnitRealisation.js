@@ -109,19 +109,22 @@ const getKurssiByCourseUnitRealisation = (
 
   const { code } = courseUnit;
   const startDate = get(activityPeriod, 'startDate');
+  const endDate = get(activityPeriod, 'endDate');
 
   return {
+    sisId: courseUnitRealisation.id,
     kurssikoodi: code,
     lukuvuosi: getLukuvuosi(startDate),
     lukukausi: getLukukausi(startDate),
     tyyppi: getTyyppiByCourseUnitRealisationTypeUrn(
       courseUnitRealisationTypeUrn,
     ),
-    kurssiNro: 1, // TODO: This shouldn't be hard coded
     kielikoodi: getKielikoodiByTeachingLanguageUrn(teachingLanguageUrn),
-    opintoviikot: 1, // TODO: This shouldn't be hard coded
+    opintoviikot: 1,
     nimi: get(name, 'fi'),
     tila: getTilaByFlowState(flowState),
+    alkamisPvm: startDate ? new Date(startDate) : null,
+    paattymisPvm: endDate ? new Date(endDate) : null,
   };
 };
 

@@ -6,5 +6,5 @@ const context = createContext(config);
 const { kurkiUpdater, logger } = context;
 
 kurkiUpdater
-  .updateCourseUnitsByCodes(['TKT21002'])
+  .updateCourseUnitsByCodes(['TKT20010'])
   .catch((error) => logger.error(error));
