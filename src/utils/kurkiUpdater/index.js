@@ -79,7 +79,10 @@ class KurkiUpdater {
       (realisation) => {
         return this.updateCourseUnitRealisation(realisation, courseUnit).catch(
           (error) => {
-            this.logger.error('Failed to update course unit realisation');
+            this.logger.error('Failed to update course unit realisation', {
+              courseUnit,
+              courseUnitRealisation: realisation,
+            });
 
             this.logger.error(error);
           },

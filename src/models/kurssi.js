@@ -4,9 +4,9 @@ import { transaction } from 'objection';
 import BaseModel, { QueryBuilder } from './baseModel';
 
 class EnhancedQueryBuilder extends QueryBuilder {
-  patchOrInsertWithKurssiNro(data) {
+  patchOrInsertWithKurssiNro(kurssi) {
     return transaction(this.modelClass(), async (Model) => {
-      const { sisId } = data;
+      const { sisId } = kurssi;
 
       if (!sisId) {
         throw new Error(`sisId is required`);
@@ -17,15 +17,15 @@ class EnhancedQueryBuilder extends QueryBuilder {
       });
 
       if (sisKurssi) {
-        await sisKurssi.$query().patch(data);
+        await sisKurssi.$query().patch(kurssi);
         return true;
       }
 
       const simultaneousKurssit = await Model.query().where({
-        kurssikoodi: data.kurssikoodi,
-        lukukausi: data.lukukausi,
-        lukuvuosi: data.lukuvuosi,
-        tyyppi: data.tyyppi,
+        kurssikoodi: kurssi.kurssikoodi,
+        lukukausi: kurssi.lukukausi,
+        lukuvuosi: kurssi.lukuvuosi,
+        tyyppi: kurssi.tyyppi,
       });
 
       const kurssiWithSameAlkamisPvm = simultaneousKurssit.find(
@@ -42,7 +42,7 @@ class EnhancedQueryBuilder extends QueryBuilder {
 
           return (
             format(normalizedAlkamisPvm, 'yyyy-MM-dd') ===
-            format(data.alkamisPvm, 'yyyy-MM-dd')
+            format(kurssi.alkamisPvm, 'yyyy-MM-dd')
           );
         },
       );
@@ -56,7 +56,7 @@ class EnhancedQueryBuilder extends QueryBuilder {
             kurssiWithSameAlkamisPvm.tyyppi,
             kurssiWithSameAlkamisPvm.kurssiNro,
           ])
-          .patch(data);
+          .patch(kurssi);
 
         return true;
       }
@@ -67,7 +67,7 @@ class EnhancedQueryBuilder extends QueryBuilder {
           : Math.max(...simultaneousKurssit.map(({ kurssiNro }) => kurssiNro)) +
             1;
 
-      await Model.query().insert({ ...data, kurssiNro });
+      await Model.query().insert({ ...kurssi, kurssiNro });
 
       return false;
     });
