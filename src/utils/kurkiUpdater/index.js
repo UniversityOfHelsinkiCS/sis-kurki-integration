@@ -97,7 +97,13 @@ class KurkiUpdater {
       courseUnitRealisationId: courseUnitRealisation.id,
     };
 
-    const owner = getCourseUnitRealisationOwner(courseUnit);
+    /*const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
+      courseUnitRealisation.id,
+    );*/
+
+    const responsibilityInfos = [];
+
+    const owner = getCourseUnitRealisationOwner(responsibilityInfos);
 
     const ownerHtunnus = owner
       ? getHtunnusByFullName({
@@ -134,15 +140,7 @@ class KurkiUpdater {
         : this.fallbackKurssiOmistaja,
     };
 
-    const id = [
-      kurssi.kurssikoodi,
-      kurssi.lukukausi,
-      kurssi.lukuvuosi,
-      kurssi.tyyppi,
-      kurssi.kurssiNro,
-    ];
-
-    await this.models.Kurssi.query().patchOrInsertById(id, kurssi);
+    await this.models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
   }
 }
 

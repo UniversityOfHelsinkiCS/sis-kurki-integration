@@ -1,6 +1,10 @@
-import { Model, QueryBuilder, transaction } from 'objection';
+import {
+  Model,
+  QueryBuilder as ObjectionQueryBuilder,
+  transaction,
+} from 'objection';
 
-class EnhancedQueryBuilder extends QueryBuilder {
+export class QueryBuilder extends ObjectionQueryBuilder {
   patchOrInsertById(id, data) {
     return transaction(this.modelClass(), async (Model) => {
       const nrUpdated = await Model.query().findById(id).patch(data);
@@ -18,7 +22,7 @@ class EnhancedQueryBuilder extends QueryBuilder {
 
 export class BaseModel extends Model {
   static get QueryBuilder() {
-    return EnhancedQueryBuilder;
+    return QueryBuilder;
   }
 }
 
