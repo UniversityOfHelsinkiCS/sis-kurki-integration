@@ -2,10 +2,7 @@ import promiseMap from 'p-map';
 
 import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 import getDistinctCourseUnits from './getDistinctCourseUnits';
-import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
-import getCourseUnitRealisationOwner from './getCourseUnitRealisationOwner';
-import getHtunnusByFullName from './getHtunnusByFullName';
-import getOpetusByStudyGroupSets from './getOpetusByStudyGroupSets';
+import CourseUnitRealisationUpdater from './courseUnitRealisationUpdater';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger, fallbackKurssiOmistaja }) {
@@ -39,19 +36,15 @@ class KurkiUpdater {
       courseUnitCodes,
     });
 
-    await promiseMap(
-      courseUnits,
-      (courseUnit) => {
-        return this.updateCourseUnit(courseUnit).catch((error) => {
-          this.logger.error('Failed to update course unit', {
-            courseUnit,
-          });
-
-          this.logger.error(error);
+    for (let courseUnit of courseUnits) {
+      await this.updateCourseUnit(courseUnit).catch((error) => {
+        this.logger.error('Failed to update course unit', {
+          courseUnit,
         });
-      },
-      { concurrency: 1, stopOnError: false },
-    );
+
+        this.logger.error(error);
+      });
+    }
 
     this.logger.info(
       `Done updating ${courseUnits.length} courses. Check logs for possible errors`,
@@ -94,113 +87,16 @@ class KurkiUpdater {
   }
 
   async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
-    const courseUnitRealisationLogPayload = {
-      courseUnitRealisationId: courseUnitRealisation.id,
-    };
-
-    /*const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
-      courseUnitRealisation.id,
-    );*/
-
-    const responsibilityInfos = [];
-
-    const owner = getCourseUnitRealisationOwner(responsibilityInfos);
-
-    const ownerHtunnus = owner
-      ? getHtunnusByFullName({
-          firstName: owner.firstName,
-          lastName: owner.lastName,
-        })
-      : undefined;
-
-    const ownerHenkilo = ownerHtunnus
-      ? await this.models.Henkilo.query().findById(ownerHtunnus)
-      : undefined;
-
-    if (!ownerHtunnus) {
-      this.logger.info(
-        `Course unit realisation's responsibility information is not found. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
-        courseUnitRealisationLogPayload,
-      );
-    } else if (!ownerHenkilo) {
-      this.logger.info(
-        `Could not find person with person id ${ownerHtunnus}. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
-        courseUnitRealisationLogPayload,
-      );
-    }
-
-    const baseKurssi = getKurssiByCourseUnitRealisation(
+    const updater = new CourseUnitRealisationUpdater({
       courseUnitRealisation,
       courseUnit,
-    );
+      models: this.models,
+      sisClient: this.sisClient,
+      logger: this.logger,
+      fallbackKurssiOmistaja: this.fallbackKurssiOmistaja,
+    });
 
-    const kurssi = {
-      ...baseKurssi,
-      omistaja: ownerHenkilo
-        ? ownerHenkilo.htunnus
-        : this.fallbackKurssiOmistaja,
-    };
-
-    await this.models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
-
-    await this.updateStudyGroups(
-      courseUnitRealisation.id,
-    );
-  }
-
-  async updateStudyGroups(id) {
-    const kurssi = await this.models.Kurssi.query().findOne({ sisId: id });
-
-    const groupSets = await this.sisClient.getCourseUnitRealisationStudyGroupSets(
-      id,
-    );
-
-    const opetusList = getOpetusByStudyGroupSets(groupSets, kurssi);
-
-    const opetusRows = opetusList.map(
-      ({ sisId, ryhmaNro, ilmoJnro, teacher }) => ({
-        sisId,
-        ryhmaNro,
-        ilmoJnro,
-        kurssikoodi: kurssi.kurssikoodi,
-        lukukausi: kurssi.lukukausi,
-        lukuvuosi: kurssi.lukuvuosi,
-        tyyppi: kurssi.tyyppi,
-        kurssiNro: kurssi.kurssiNro,
-        teacher,
-      }),
-    );
-
-    await promiseMap(
-      opetusRows,
-      (opetus) => {
-        this.updateStudyGroup(opetus).catch((error) => {
-          this.logger.error('Failed to update study group', {
-            studyGroup: opetus,
-          });
-          this.logger.error(error);
-        });
-      },
-      { concurrency: 5, stopOnError: false },
-    );
-  }
-
-  async updateStudyGroup(opetus) {
-    const { teacher, ...restOpetus } = opetus;
-
-    await this.models.Opetus.query().patchOrInsertById(
-      [
-        opetus.kurssikoodi,
-        opetus.lukukausi,
-        opetus.lukuvuosi,
-        opetus.tyyppi,
-        opetus.kurssiNro,
-        opetus.ryhmaNro,
-      ],
-      restOpetus,
-    );
-
-    console.log(teacher);
+    await updater.update();
   }
 }
 

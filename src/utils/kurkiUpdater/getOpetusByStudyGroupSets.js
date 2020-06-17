@@ -21,15 +21,22 @@ const getOpetusByStudyGroupSets = (groupSets, kurssi) => {
       sisId: s.id,
       ryhmaNro: i + 2,
       ilmoJnro: getIlmoJnroByStudyGroupName(get(s.name, 'fi')),
+      opetustehtava: 'LH',
       teacher: s.teachers ? s.teachers[0] : undefined,
     };
   });
 
   if (group99) {
-    opetus = [...opetus, { ryhmaNro: 1, ilmoJnro: 99, sisId: group99.id }];
+    opetus = [
+      ...opetus,
+      { ryhmaNro: 1, ilmoJnro: 99, sisId: group99.id, opetustehtava: 'LH' },
+    ];
   }
 
-  opetus = [...opetus, { ryhmaNro: 0, ilmoJnro: null, sisId }];
+  opetus = [
+    ...opetus,
+    { ryhmaNro: 0, ilmoJnro: null, sisId, opetustehtava: 'LU' },
+  ];
 
   return opetus;
 };
