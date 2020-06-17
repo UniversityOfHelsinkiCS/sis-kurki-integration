@@ -5,6 +5,7 @@ import getDistinctCourseUnits from './getDistinctCourseUnits';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getCourseUnitRealisationOwner from './getCourseUnitRealisationOwner';
 import getHtunnusByFullName from './getHtunnusByFullName';
+import getOpetusByStudyGroupSets from './getOpetusByStudyGroupSets';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger, fallbackKurssiOmistaja }) {
@@ -88,7 +89,7 @@ class KurkiUpdater {
           },
         );
       },
-      { concurrency: 10, stopOnError: false },
+      { concurrency: 5, stopOnError: false },
     );
   }
 
@@ -141,6 +142,65 @@ class KurkiUpdater {
     };
 
     await this.models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
+
+    await this.updateStudyGroups(
+      courseUnitRealisation.id,
+    );
+  }
+
+  async updateStudyGroups(id) {
+    const kurssi = await this.models.Kurssi.query().findOne({ sisId: id });
+
+    const groupSets = await this.sisClient.getCourseUnitRealisationStudyGroupSets(
+      id,
+    );
+
+    const opetusList = getOpetusByStudyGroupSets(groupSets, kurssi);
+
+    const opetusRows = opetusList.map(
+      ({ sisId, ryhmaNro, ilmoJnro, teacher }) => ({
+        sisId,
+        ryhmaNro,
+        ilmoJnro,
+        kurssikoodi: kurssi.kurssikoodi,
+        lukukausi: kurssi.lukukausi,
+        lukuvuosi: kurssi.lukuvuosi,
+        tyyppi: kurssi.tyyppi,
+        kurssiNro: kurssi.kurssiNro,
+        teacher,
+      }),
+    );
+
+    await promiseMap(
+      opetusRows,
+      (opetus) => {
+        this.updateStudyGroup(opetus).catch((error) => {
+          this.logger.error('Failed to update study group', {
+            studyGroup: opetus,
+          });
+          this.logger.error(error);
+        });
+      },
+      { concurrency: 5, stopOnError: false },
+    );
+  }
+
+  async updateStudyGroup(opetus) {
+    const { teacher, ...restOpetus } = opetus;
+
+    await this.models.Opetus.query().patchOrInsertById(
+      [
+        opetus.kurssikoodi,
+        opetus.lukukausi,
+        opetus.lukuvuosi,
+        opetus.tyyppi,
+        opetus.kurssiNro,
+        opetus.ryhmaNro,
+      ],
+      restOpetus,
+    );
+
+    console.log(teacher);
   }
 }
 

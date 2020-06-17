@@ -9,11 +9,13 @@ KURKI_DB_USER=system
 KURKI_DB_PASSWORD=oracle
 KURKI_DB_CONNECTION_STRING=kurki-db:1521/xe
 KURKI_FALLBACK_KURSSI_OMISTAJA=DOE_J
+SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/sisu/test
 SIS_API_TOKEN=<SIS_API_TOKEN>
-SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
+SIS_IMPORTER_API_TOKEN=<SIS_IMPORTER_API_TOKEN>
+SIS_IMPORTER_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
 ```
 
-You will need to request the value of the `SIS_API_TOKEN` from Toska to be able to finish the development setup.
+You will need to request the value of the `SIS_API_TOKEN` and the `SIS_IMPORTER_API_TOKEN` from Toska to be able to finish the development setup.
 
 2. Build the docker image by running `docker-compose up --build`.
 
@@ -45,7 +47,7 @@ And run the following command:
 ALTER SYSTEM DISABLE RESTRICTED SESSION;
 ```
 
-When you want to install new npm packages, since project has to have packages installed inside the container use 
+When you want to install new npm packages, since project has to have packages installed inside the container use
 `npm run install axios` or if you need to reinstall package.json use `npm run build`.
 
 ## Running tests
@@ -67,4 +69,14 @@ docker exec -it sis-kurki-integration /bin/bash
 
 ## Todo
 
-- Add `sisId` for `Kurssi` table in Kurki.
+- Add `SIS_ID` for `Kurssi` table in Kurki:
+
+```sql
+ALTER TABLE Kurssi ADD SIS_ID VARCHAR2(50) UNIQUE;
+```
+
+- Add `SIS_ID` for `Opetus` table in Kurki:
+
+```sql
+ALTER TABLE Opetus ADD SIS_ID VARCHAR2(50) UNIQUE;
+```

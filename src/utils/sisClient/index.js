@@ -80,6 +80,30 @@ class SisClient {
       get(result, 'data.course_unit_realisation.responsibilityInfos') || []
     );
   }
+
+  async getCourseUnitRealisationStudyGroupSets(id) {
+    const query = `
+      query getCourseUnitRealisation($id: ID!) {
+        studyGroupSets {
+          studySubGroups {
+            id
+            name { 
+              fi
+            }
+             teachers {
+              id
+              firstName
+              lastName
+            }
+          }
+        }
+      }
+    `;
+
+    const result = await this.graphqlClient.query(query, { id });
+
+    return get(result, 'data.course_unit_realisation.studyGroupSets') || [];
+  }
 }
 
 export default SisClient;
