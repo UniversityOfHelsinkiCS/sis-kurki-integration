@@ -1,7 +1,7 @@
 version: "3.5"
 
 services:
-  kurki-db:
+  kurki-integration-db:
     image: banglamon/oracle193db:19.3.0-ee
     ports:
       - "8080:8080"
@@ -12,24 +12,28 @@ services:
       ORACLE_PWD: oracle
     volumes:
       - oracle_data:/opt/oracle/oradata
-    container_name: kurki-db
+    container_name: kurki-integration-db
 
   sis-kurki-integration:
     build:
       context: ./
       dockerfile: config/dev.Dockerfile
     environment:
-      KURKI_DB_USER: system
+      KURKI_DB_USER: tk_opha2
       KURKI_DB_PASSWORD: oracle
-      KURKI_DB_CONNECTION_STRING: kurki-db:1521/xe
+      KURKI_DB_CONNECTION_STRING: kurki-db:1521/opetest2
       KURKI_FALLBACK_KURSSI_OMISTAJA: DOE_J
     volumes:
       - ./:/usr/src/app
       - nodemodules:/usr/src/app/node_modules/
     container_name: sis-kurki-integration
-    depends_on:
-      - kurki-db
+    networks:
+      - kurki_default
 
 volumes:
   oracle_data:
   nodemodules:
+
+networks:
+  kurki_default:
+    external: true
