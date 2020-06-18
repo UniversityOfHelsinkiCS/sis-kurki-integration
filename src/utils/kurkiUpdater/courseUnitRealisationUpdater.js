@@ -1,6 +1,7 @@
+import { isNumber } from 'lodash';
+
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getCourseUnitRealisationOwner from './getCourseUnitRealisationOwner';
-import getHtunnusByFullName from './getHtunnusByFullName';
 import getOpetusByStudyGroupSets from './getOpetusByStudyGroupSets';
 
 class CourseUnitRealisationUpdater {
@@ -20,38 +21,47 @@ class CourseUnitRealisationUpdater {
     this.fallbackKurssiOmistaja = fallbackKurssiOmistaja;
   }
 
+  async getPeriods() {
+    const { activityPeriod } = this.courseUnitRealisation;
+    const { startDate, endDate } = activityPeriod || {};
+
+    const periods = await Promise.all([
+      this.models.Periodi.query().findPnumeroByDate(startDate),
+      this.models.Periodi.query().findPnumeroByDate(endDate),
+    ]);
+
+    return periods;
+  }
+
+  getKurssi() {
+    return this.models.Kurssi.query().findOne({
+      sisId: this.courseUnitRealisation.id,
+    });
+  }
+
   async update() {
     const courseUnitRealisationLogPayload = {
       courseUnitRealisationId: this.courseUnitRealisation.id,
     };
 
-    /*const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
-      courseUnitRealisation.id,
-    );*/
-
-    const responsibilityInfos = [];
+    const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
+      this.courseUnitRealisation.id,
+    );
 
     const owner = getCourseUnitRealisationOwner(responsibilityInfos);
 
-    const ownerHtunnus = owner
-      ? getHtunnusByFullName({
-          firstName: owner.firstName,
-          lastName: owner.lastName,
-        })
+    const ownerHenkilo = owner
+      ? await this.models.Henkilo.query().findOneByPerson(owner)
       : undefined;
 
-    const ownerHenkilo = ownerHtunnus
-      ? await this.models.Henkilo.query().findById(ownerHtunnus)
-      : undefined;
-
-    if (!ownerHtunnus) {
+    if (!owner) {
       this.logger.info(
         `Course unit realisation's responsibility information is not found. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
         courseUnitRealisationLogPayload,
       );
     } else if (!ownerHenkilo) {
       this.logger.info(
-        `Could not find person with person id ${ownerHtunnus}. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
+        `Could not find person. Setting course unit realisation owner as ${this.fallbackKurssiOmistaja}`,
         courseUnitRealisationLogPayload,
       );
     }
@@ -61,8 +71,12 @@ class CourseUnitRealisationUpdater {
       this.courseUnit,
     );
 
+    const [periodi, periodi2] = await this.getPeriods();
+
     const kurssi = {
       ...baseKurssi,
+      periodi,
+      periodi2,
       omistaja: ownerHenkilo
         ? ownerHenkilo.htunnus
         : this.fallbackKurssiOmistaja,
@@ -74,27 +88,29 @@ class CourseUnitRealisationUpdater {
   }
 
   async updateStudyGroups() {
-    const kurssi = await this.models.Kurssi.query().findOne({
-      sisId: this.courseUnitRealisation.id,
-    });
+    const kurssi = await this.getKurssi();
 
     const groupSets = await this.sisClient.getCourseUnitRealisationStudyGroupSets(
       this.courseUnitRealisation.id,
     );
 
-    const opetusList = getOpetusByStudyGroupSets(groupSets, kurssi);
+    const opetusArr = getOpetusByStudyGroupSets(groupSets, kurssi);
 
-    const opetusRows = opetusList.map((opetus) => ({
+    const opetusRows = opetusArr.map((opetus) => ({
       ...opetus,
       kurssikoodi: kurssi.kurssikoodi,
       lukukausi: kurssi.lukukausi,
       lukuvuosi: kurssi.lukuvuosi,
       tyyppi: kurssi.tyyppi,
       kurssiNro: kurssi.kurssiNro,
+      ilmo: 'K',
+      opetustehtava: isNumber(opetus.ilmoJnro) ? 'LH' : 'LU',
     }));
 
     for (let opetus of opetusRows) {
-      await this.updateStudyGroup(opetus).catch((error) => {
+      const { teacher, ...restOpetus } = opetus;
+
+      await this.updateStudyGroup(restOpetus, teacher).catch((error) => {
         this.logger.error('Failed to update study group', {
           studyGroup: opetus,
         });
@@ -105,8 +121,6 @@ class CourseUnitRealisationUpdater {
   }
 
   async updateStudyGroup(opetus) {
-    const { teacher, ...restOpetus } = opetus;
-
     await this.models.Opetus.query().patchOrInsertById(
       [
         opetus.kurssikoodi,
@@ -116,10 +130,8 @@ class CourseUnitRealisationUpdater {
         opetus.kurssiNro,
         opetus.ryhmaNro,
       ],
-      restOpetus,
+      opetus,
     );
-
-    console.log(teacher);
   }
 }
 
