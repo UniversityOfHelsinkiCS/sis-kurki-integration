@@ -19,21 +19,15 @@ services:
       context: ./
       dockerfile: config/dev.Dockerfile
     environment:
-      KURKI_DB_USER: tk_opha2
+      KURKI_DB_USER: system
       KURKI_DB_PASSWORD: oracle
-      KURKI_DB_CONNECTION_STRING: kurki-db:1521/opetest2
+      KURKI_DB_CONNECTION_STRING: kurki-integration-db:1521/xe
       KURKI_FALLBACK_KURSSI_OMISTAJA: DOE_J
     volumes:
       - ./:/usr/src/app
       - nodemodules:/usr/src/app/node_modules/
     container_name: sis-kurki-integration
-    networks:
-      - kurki_default
 
 volumes:
   oracle_data:
   nodemodules:
-
-networks:
-  kurki_default:
-    external: true

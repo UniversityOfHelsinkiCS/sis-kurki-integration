@@ -1,0 +1,20 @@
+version: "3.5"
+
+# Note that this file is used by chaining the docker-compose files. It inherits all configs from another docker-compose and only overwrites / adds the selected here
+
+services:
+  sis-kurki-integration:
+    environment:
+      KURKI_DB_USER: tk_opha2
+      KURKI_DB_PASSWORD: oracle
+      KURKI_DB_CONNECTION_STRING: kurki-db:1521/opetest2
+      KURKI_FALLBACK_KURSSI_OMISTAJA: DOE_J
+    networks:
+      - kurki_default
+
+volumes:
+  nodemodules:
+
+networks:
+  kurki_default:
+    external: true
