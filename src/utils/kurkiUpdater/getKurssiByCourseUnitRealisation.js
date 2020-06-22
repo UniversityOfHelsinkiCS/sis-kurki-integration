@@ -95,10 +95,7 @@ const getTilaByFlowState = (flowState) => {
   return tilaByFlowState[flowState] || 'O';
 };
 
-const getKurssiByCourseUnitRealisation = (
-  courseUnitRealisation,
-  courseUnit,
-) => {
+const getKurssiByCourseUnitRealisation = (courseUnitRealisation) => {
   const {
     activityPeriod,
     teachingLanguageUrn,
@@ -107,13 +104,11 @@ const getKurssiByCourseUnitRealisation = (
     name,
   } = courseUnitRealisation;
 
-  const { code } = courseUnit;
   const startDate = get(activityPeriod, 'startDate');
   const endDate = get(activityPeriod, 'endDate');
 
   return {
     sisId: courseUnitRealisation.id,
-    kurssikoodi: code,
     lukuvuosi: getLukuvuosi(startDate),
     lukukausi: getLukukausi(startDate),
     tyyppi: getTyyppiByCourseUnitRealisationTypeUrn(

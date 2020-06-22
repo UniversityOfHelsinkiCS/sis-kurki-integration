@@ -79,6 +79,10 @@ class Kurssi extends BaseModel {
     return EnhancedQueryBuilder;
   }
 
+  isExam() {
+    return this.tyyppi === 'L';
+  }
+
   static get idColumn() {
     return ['kurssikoodi', 'lukukausi', 'lukuvuosi', 'tyyppi', 'kurssiNro'];
   }

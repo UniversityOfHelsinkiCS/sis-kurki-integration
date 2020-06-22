@@ -51,9 +51,9 @@ const createContext = (config) => {
 
   const kurkiUpdater = new KurkiUpdater({
     models,
-    sisClient,
     logger,
     fallbackKurssiOmistaja: config.kurki.fallbackKurssiOmistaja,
+    sisClient,
   });
 
   return {

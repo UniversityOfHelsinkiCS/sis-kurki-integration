@@ -1,8 +1,5 @@
-import promiseMap from 'p-map';
-
-import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 import getDistinctCourseUnits from './getDistinctCourseUnits';
-import CourseUnitRealisationUpdater from './courseUnitRealisationUpdater';
+import OpintojaksoUpdater from './opintojaksoUpdater';
 
 class KurkiUpdater {
   constructor({ models, sisClient, logger, fallbackKurssiOmistaja }) {
@@ -16,7 +13,7 @@ class KurkiUpdater {
     const allCourseUnits = await this.sisClient.getCourseUnitsByCodes(codes);
     const courseUnits = getDistinctCourseUnits(allCourseUnits);
 
-    return this.updateCourseUnits(courseUnits);
+    return this.updateOpintojaksot(courseUnits);
   }
 
   async updateCourseUnitsByProgamme(programme) {
@@ -26,10 +23,10 @@ class KurkiUpdater {
 
     const courseUnits = getDistinctCourseUnits(allCourseUnits);
 
-    return this.updateCourseUnits(courseUnits);
+    return this.updateOpintojaksot(courseUnits);
   }
 
-  async updateCourseUnits(courseUnits) {
+  async updateOpintojaksot(courseUnits) {
     const courseUnitCodes = courseUnits.map(({ code }) => code);
 
     this.logger.info(`Starting to update ${courseUnits.length} courses`, {
@@ -37,7 +34,7 @@ class KurkiUpdater {
     });
 
     for (let courseUnit of courseUnits) {
-      await this.updateCourseUnit(courseUnit).catch((error) => {
+      await this.updateOpintojakso(courseUnit).catch((error) => {
         this.logger.error('Failed to update course unit', {
           courseUnit,
         });
@@ -52,46 +49,11 @@ class KurkiUpdater {
     );
   }
 
-  async updateCourseUnit(courseUnit) {
-    const opintojakso = getOpintojaksoByCourseUnit(courseUnit);
-
-    await this.models.Opintojakso.query().patchOrInsertById(
-      courseUnit.code,
-      opintojakso,
-    );
-
-    await this.updateCourseUnitRealisations(courseUnit);
-  }
-
-  async updateCourseUnitRealisations(courseUnit) {
-    const courseUnitRealisations = await this.sisClient.getCourseUnitRealisationsByCode(
-      courseUnit.code,
-    );
-
-    await promiseMap(
-      courseUnitRealisations,
-      (realisation) => {
-        return this.updateCourseUnitRealisation(realisation, courseUnit).catch(
-          (error) => {
-            this.logger.error('Failed to update course unit realisation', {
-              courseUnit,
-              courseUnitRealisation: realisation,
-            });
-
-            this.logger.error(error);
-          },
-        );
-      },
-      { concurrency: 5, stopOnError: false },
-    );
-  }
-
-  async updateCourseUnitRealisation(courseUnitRealisation, courseUnit) {
-    const updater = new CourseUnitRealisationUpdater({
-      courseUnitRealisation,
+  async updateOpintojakso(courseUnit) {
+    const updater = new OpintojaksoUpdater({
       courseUnit,
-      models: this.models,
       sisClient: this.sisClient,
+      models: this.models,
       logger: this.logger,
       fallbackKurssiOmistaja: this.fallbackKurssiOmistaja,
     });
