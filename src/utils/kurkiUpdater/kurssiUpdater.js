@@ -32,6 +32,8 @@ class KurssiUpdater {
       ? await this.models.Henkilo.query().findOneByPerson(owner)
       : undefined;
 
+    // TODO: opetustehtavan hoito for lecturer https://github.com/UniversityOfHelsinkiCS/opetushallinto/blob/master/oodi_integration/lib/kurha.rb#L574
+
     const baseKurssi = getKurssiByCourseUnitRealisation(
       this.courseUnitRealisation,
     );
@@ -60,14 +62,13 @@ class KurssiUpdater {
       lukuvuosi,
       tyyppi,
       kurssiNro,
+      sisId,
     } = this.kurssi;
 
     let opetukset = [];
 
     if (this.kurssi.isExam()) {
-      opetukset = [
-        { ryhmaNro: 1, ilmoJnro: 1, sisId: this.courseUnitRealisation.id },
-      ];
+      opetukset = [{ ryhmaNro: 1, ilmoJnro: 1, sisId }];
     } else {
       const groupSets = await this.sisClient.getCourseUnitRealisationStudyGroupSets(
         this.courseUnitRealisation.id,
@@ -104,18 +105,52 @@ class KurssiUpdater {
     }
   }
 
-  async updateOpetus(opetus) {
-    await this.models.Opetus.query().patchOrInsertById(
-      [
-        opetus.kurssikoodi,
-        opetus.lukukausi,
-        opetus.lukuvuosi,
-        opetus.tyyppi,
-        opetus.kurssiNro,
-        opetus.ryhmaNro,
-      ],
-      opetus,
-    );
+  async updateOpetus(opetus, teacher) {
+    const {
+      kurssikoodi,
+      lukukausi,
+      lukuvuosi,
+      tyyppi,
+      kurssiNro,
+      ryhmaNro,
+    } = opetus;
+
+    const opetusId = [
+      kurssikoodi,
+      lukukausi,
+      lukuvuosi,
+      tyyppi,
+      kurssiNro,
+      ryhmaNro,
+    ];
+
+    await this.models.Opetus.query().patchOrInsertById(opetusId, opetus);
+
+    const teacherHenkilo = teacher
+      ? await this.models.Henkilo.query().findOneByPerson(teacher)
+      : undefined;
+
+    if (teacherHenkilo) {
+      const { htunnus } = teacherHenkilo;
+      const opetustehtava = 'HT';
+      const opetustehtavanHoitoId = [...opetusId, htunnus, opetustehtava];
+
+      const opetustehtavanHoito = {
+        kurssikoodi,
+        lukukausi,
+        lukuvuosi,
+        tyyppi,
+        kurssiNro,
+        ryhmaNro,
+        htunnus,
+        opetustehtava,
+      };
+
+      await this.models.OpetustehtavanHoito.query().patchOrInsertById(
+        opetustehtavanHoitoId,
+        opetustehtavanHoito,
+      );
+    }
   }
 }
 

@@ -3,9 +3,11 @@ import getHtunnusByFullName from '../utils/getHtunnusByFullName';
 
 class EnhancedQueryBuilder extends QueryBuilder {
   async findOneByPerson(person) {
+    const { firstName, lastName } = person;
+
     const htunnus = getHtunnusByFullName({
-      firstName: person.firstName,
-      lastName: person.lastName,
+      firstName,
+      lastName,
     });
 
     return this.findById(htunnus);
