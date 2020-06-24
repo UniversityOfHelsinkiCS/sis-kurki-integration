@@ -148,7 +148,7 @@ class KurssiUpdater {
   }
 
   async updateOpetukset() {
-    const opetukset = this.getOpetukset();
+    const opetukset = await this.getOpetukset();
 
     for (let opetus of opetukset) {
       const { teacher, ...restOpetus } = opetus;
