@@ -3,6 +3,7 @@ import { isNumber } from 'lodash';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getKurssiOmistajaByResponsibilityInfos from './getKurssiOmistajaByResponsibilityInfos';
 import getOpetuksetByStudyGroupSets from './getOpetuksetByStudyGroupSets';
+import getLecturersByResponsibilityInfos from './getLecturersByResponsibilityInfos';
 
 class KurssiUpdater {
   constructor({
@@ -32,8 +33,6 @@ class KurssiUpdater {
       ? await this.models.Henkilo.query().findOneByPerson(owner)
       : undefined;
 
-    // TODO: opetustehtavan hoito for lecturer https://github.com/UniversityOfHelsinkiCS/opetushallinto/blob/master/oodi_integration/lib/kurha.rb#L574
-
     const baseKurssi = getKurssiByCourseUnitRealisation(
       this.courseUnitRealisation,
     );
@@ -53,6 +52,65 @@ class KurssiUpdater {
     });
 
     await this.updateOpetukset();
+
+    if (!this.kurssi.isExam()) {
+      await this.updateLecturers(responsibilityInfos);
+    }
+  }
+
+  async updateLecturers(responsibilityInfos) {
+    const persons = getLecturersByResponsibilityInfos(responsibilityInfos);
+
+    await Promise.all(
+      persons.map((person) => {
+        this.updateOpetustehtavanHoitoForPerson(person, 0, 'LU');
+      }),
+    );
+  }
+
+  async updateOpetustehtavanHoitoForPerson(person, ryhmaNro, opetustehtava) {
+    const henkilo = person
+      ? await this.models.Henkilo.findOneByPerson(person)
+      : undefined;
+
+    const {
+      kurssikoodi,
+      lukukausi,
+      lukuvuosi,
+      tyyppi,
+      kurssiNro,
+    } = this.kurssi;
+
+    if (henkilo) {
+      const { htunnus } = henkilo;
+
+      const opetustehtavanHoitoId = [
+        kurssikoodi,
+        lukukausi,
+        lukuvuosi,
+        tyyppi,
+        kurssiNro,
+        ryhmaNro,
+        htunnus,
+        opetustehtava,
+      ];
+
+      const opetustehtavanHoito = {
+        kurssikoodi,
+        lukukausi,
+        lukuvuosi,
+        tyyppi,
+        kurssiNro,
+        ryhmaNro,
+        htunnus,
+        opetustehtava,
+      };
+
+      await this.models.OpetustehtavanHoito.query().patchOrInsertById(
+        opetustehtavanHoitoId,
+        opetustehtavanHoito,
+      );
+    }
   }
 
   async getOpetukset() {
@@ -126,31 +184,7 @@ class KurssiUpdater {
 
     await this.models.Opetus.query().patchOrInsertById(opetusId, opetus);
 
-    const teacherHenkilo = teacher
-      ? await this.models.Henkilo.query().findOneByPerson(teacher)
-      : undefined;
-
-    if (teacherHenkilo) {
-      const { htunnus } = teacherHenkilo;
-      const opetustehtava = 'HT';
-      const opetustehtavanHoitoId = [...opetusId, htunnus, opetustehtava];
-
-      const opetustehtavanHoito = {
-        kurssikoodi,
-        lukukausi,
-        lukuvuosi,
-        tyyppi,
-        kurssiNro,
-        ryhmaNro,
-        htunnus,
-        opetustehtava,
-      };
-
-      await this.models.OpetustehtavanHoito.query().patchOrInsertById(
-        opetustehtavanHoitoId,
-        opetustehtavanHoito,
-      );
-    }
+    await this.updateOpetustehtavanHoitoForPerson(teacher, ryhmaNro, 'HT');
   }
 }
 
