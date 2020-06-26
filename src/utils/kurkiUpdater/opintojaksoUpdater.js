@@ -1,7 +1,7 @@
 import promiseMap from 'p-map';
 
 import KurssiUpdater from './kurssiUpdater';
-import getOpintojaksoByCourseUnit from './kurssiUpdatergetOpintojaksoByCourseUnit';
+import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 
 class OpintojaksoUpdater {
   constructor({
