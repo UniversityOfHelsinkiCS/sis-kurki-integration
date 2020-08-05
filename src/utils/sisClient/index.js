@@ -84,16 +84,18 @@ class SisClient {
   async getCourseUnitRealisationStudyGroupSets(id) {
     const query = `
       query getCourseUnitRealisation($id: ID!) {
-        studyGroupSets {
-          studySubGroups {
-            id
-            name { 
-              fi
-            }
-             teachers {
+        course_unit_realisation(id: $id) {
+          studyGroupSets {
+            studySubGroups {
               id
-              firstName
-              lastName
+              name { 
+                fi
+              }
+              teachers {
+                id
+                firstName
+                lastName
+              }
             }
           }
         }
