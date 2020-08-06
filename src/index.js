@@ -1,7 +1,6 @@
-import config from './config';
 import createContext from './context';
 
-const context = createContext(config);
+const context = createContext();
 
 const { kurkiUpdater, logger } = context;
 
