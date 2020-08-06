@@ -4,21 +4,20 @@ import axios from 'axios';
 
 import bindModels from './models';
 import SisImporterClient from './utils/sisClient/sisImporterClient';
-import SisGraphqlClient from './utils/sisClient/sisGraphqlClient';
 import SisClient from './utils/sisClient';
 import createLogger from './utils/logger';
 import KurkiUpdater from './utils/kurkiUpdater';
 
-const createSisClient = (config) => {
-  const importerHttpClient = axios.create({
-    baseURL: config.sis.importerApiUrl,
-    httpsAgent: new https.Agent({
-      rejectUnauthorized: false,
-    }),
-  });
+import {
+  DB_CONFIG,
+  SIS_IMPORTER_API_URL,
+  SIS_IMPORTER_API_TOKEN,
+  KURKI_FALLBACK_KURSSI_OMISTAJA,
+} from './config';
 
-  const graphqlHttpClient = axios.create({
-    baseURL: `${config.sis.apiUrl}/graphql`,
+const createSisClient = () => {
+  const importerHttpClient = axios.create({
+    baseURL: SIS_IMPORTER_API_URL,
     httpsAgent: new https.Agent({
       rejectUnauthorized: false,
     }),
@@ -26,33 +25,27 @@ const createSisClient = (config) => {
 
   const importerClient = new SisImporterClient({
     httpClient: importerHttpClient,
-    token: config.sis.importerToken,
-  });
-
-  const graphqlClient = new SisGraphqlClient({
-    httpClient: graphqlHttpClient,
-    token: config.sis.token,
+    token: SIS_IMPORTER_API_TOKEN,
   });
 
   return new SisClient({
     importerClient,
-    graphqlClient,
   });
 };
 
-const createContext = (config) => {
-  const db = createKnex(config.kurki.db);
+const createContext = () => {
+  const db = createKnex(DB_CONFIG);
 
   const models = bindModels(db);
 
-  const sisClient = createSisClient(config);
+  const sisClient = createSisClient();
 
   const logger = createLogger();
 
   const kurkiUpdater = new KurkiUpdater({
     models,
     logger,
-    fallbackKurssiOmistaja: config.kurki.fallbackKurssiOmistaja,
+    fallbackKurssiOmistaja: KURKI_FALLBACK_KURSSI_OMISTAJA,
     sisClient,
   });
 

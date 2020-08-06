@@ -4,7 +4,7 @@ import getIlmoJnroByStudyGroupName from './getIlmoJnroByStudyGroupName';
 
 const getOpetusByStudyGroupSets = (groupSets, kurssi) => {
   const { sisId } = kurssi;
-  const groups = flatMap(groupSets, ({ studyGroups }) => studyGroups);
+  const groups = flatMap(groupSets, ({ studySubGroups }) => studySubGroups);
 
   const group99 = groups.find(
     ({ name }) => getIlmoJnroByStudyGroupName(get(name, 'fi')) === 99,

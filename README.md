@@ -9,13 +9,11 @@ KURKI_DB_USER=system
 KURKI_DB_PASSWORD=oracle
 KURKI_DB_CONNECTION_STRING=kurki-db:1521/xe
 KURKI_FALLBACK_KURSSI_OMISTAJA=DOE_J
-SIS_API_URL=https://oodikone-staging.cs.helsinki.fi/sisu/test
-SIS_API_TOKEN=<SIS_API_TOKEN>
 SIS_IMPORTER_API_TOKEN=<SIS_IMPORTER_API_TOKEN>
 SIS_IMPORTER_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
 ```
 
-You will need to request the value of the `SIS_API_TOKEN` and the `SIS_IMPORTER_API_TOKEN` from Toska to be able to finish the development setup.
+You will need to request the value of the `SIS_IMPORTER_API_TOKEN` from Toska to be able to finish the development setup.
 
 2. Build the docker image by running `docker-compose up --build`.
 

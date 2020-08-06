@@ -1,9 +1,8 @@
-import { isArray, get } from 'lodash';
+import { isArray } from 'lodash';
 
 class SisClient {
-  constructor({ importerClient, graphqlClient }) {
+  constructor({ importerClient }) {
     this.importerClient = importerClient;
-    this.graphqlClient = graphqlClient;
   }
 
   async getCourseUnits(options = {}) {
@@ -47,7 +46,7 @@ class SisClient {
     }
 
     const { data } = await this.importerClient.get(
-      `/course_unit_realisations`,
+      '/course_unit_realisations',
       {
         params: { code },
       },
@@ -57,54 +56,19 @@ class SisClient {
   }
 
   async getCourseUnitRealisationResponsibilityInfos(id) {
-    const query = `
-      query getCourseUnitRealisation($id: ID!) {
-        course_unit_realisation(id: $id) {
-          responsibilityInfos {
-            role {
-              urn
-            }
-            person {
-              id
-              firstName
-              lastName
-            }
-          }
-        }
-      }
-    `;
-
-    const result = await this.graphqlClient.query(query, { id });
-
-    return (
-      get(result, 'data.course_unit_realisation.responsibilityInfos') || []
+    const { data } = await this.importerClient.get(
+      `/course_unit_realisations/${id}/responsibility_infos`,
     );
+
+    return data;
   }
 
   async getCourseUnitRealisationStudyGroupSets(id) {
-    const query = `
-      query getCourseUnitRealisation($id: ID!) {
-        course_unit_realisation(id: $id) {
-          studyGroupSets {
-            studySubGroups {
-              id
-              name { 
-                fi
-              }
-              teachers {
-                id
-                firstName
-                lastName
-              }
-            }
-          }
-        }
-      }
-    `;
+    const { data } = await this.importerClient.get(
+      `/course_unit_realisations/${id}/study_group_sets`,
+    );
 
-    const result = await this.graphqlClient.query(query, { id });
-
-    return get(result, 'data.course_unit_realisation.studyGroupSets') || [];
+    return data;
   }
 }
 
