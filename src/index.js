@@ -1,8 +1,5 @@
-import createContext from './context';
-
-const context = createContext();
-
-const { kurkiUpdater, logger } = context;
+import kurkiUpdater from './utils/kurkiUpdater';
+import logger from './utils/logger';
 
 kurkiUpdater
   .updateCourseUnitsByCodes(['TKT20010'])

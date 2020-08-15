@@ -1,3 +1,4 @@
+import db from '../db';
 import Kurssi from './kurssi';
 import Opintojakso from './opintojakso';
 import Henkilo from './henkilo';
@@ -8,7 +9,7 @@ import Opetus from './opetus';
 import OpetustehtavanHoito from './opetustehtavanHoito';
 import Periodi from './periodi';
 
-const bindModels = (knex) => {
+export const bindModels = (knex) => {
   return {
     Kurssi: Kurssi.bindKnex(knex),
     Opintojakso: Opintojakso.bindKnex(knex),
@@ -22,4 +23,4 @@ const bindModels = (knex) => {
   };
 };
 
-export default bindModels;
+export default bindModels(db);

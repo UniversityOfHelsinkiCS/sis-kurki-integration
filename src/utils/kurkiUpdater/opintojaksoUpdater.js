@@ -1,20 +1,14 @@
 import promiseMap from 'p-map';
 
+import models from '../../models';
+import logger from '../logger';
+import sisClient from '../sisClient';
 import KurssiUpdater from './kurssiUpdater';
 import getOpintojaksoByCourseUnit from './getOpintojaksoByCourseUnit';
 
 class OpintojaksoUpdater {
-  constructor({
-    courseUnit,
-    sisClient,
-    models,
-    logger,
-    fallbackKurssiOmistaja,
-  }) {
+  constructor({ courseUnit, fallbackKurssiOmistaja }) {
     this.courseUnit = courseUnit;
-    this.sisClient = sisClient;
-    this.models = models;
-    this.logger = logger;
     this.fallbackKurssiOmistaja = fallbackKurssiOmistaja;
   }
 
@@ -22,14 +16,12 @@ class OpintojaksoUpdater {
     const opintojakso = getOpintojaksoByCourseUnit(this.courseUnit);
     const { kurssikoodi } = opintojakso;
 
-    await this.models.Opintojakso.query().patchOrInsertById(
+    await models.Opintojakso.query().patchOrInsertById(
       kurssikoodi,
       opintojakso,
     );
 
-    this.opintojakso = await this.models.Opintojakso.query().findById(
-      kurssikoodi,
-    );
+    this.opintojakso = await models.Opintojakso.query().findById(kurssikoodi);
 
     await this.updateKurssit();
   }
@@ -37,7 +29,7 @@ class OpintojaksoUpdater {
   async updateKurssit() {
     const { kurssikoodi } = this.opintojakso;
 
-    const courseUnitRealisations = await this.sisClient.getCourseUnitRealisationsByCode(
+    const courseUnitRealisations = await sisClient.getCourseUnitRealisationsByCode(
       kurssikoodi,
     );
 
@@ -45,12 +37,12 @@ class OpintojaksoUpdater {
       courseUnitRealisations,
       (realisation) => {
         return this.updateKurssi(realisation).catch((error) => {
-          this.logger.error('Failed to update course unit realisation', {
+          logger.error('Failed to update course unit realisation', {
             courseUnit: this.courseUnit,
             courseUnitRealisation: realisation,
           });
 
-          this.logger.error(error);
+          logger.error(error);
         });
       },
       { concurrency: 5, stopOnError: false },
@@ -61,9 +53,6 @@ class OpintojaksoUpdater {
     const updater = new KurssiUpdater({
       opintojakso: this.opintojakso,
       courseUnitRealisation,
-      sisClient: this.sisClient,
-      models: this.models,
-      logger: this.logger,
       fallbackKurssiOmistaja: this.fallbackKurssiOmistaja,
     });
 

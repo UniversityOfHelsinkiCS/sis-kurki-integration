@@ -1,36 +1,29 @@
 import { isNumber } from 'lodash';
 
+import models from '../../models';
+import logger from '../logger';
+import sisClient from '../sisClient';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getKurssiOmistajaByResponsibilityInfos from './getKurssiOmistajaByResponsibilityInfos';
 import getOpetuksetByStudyGroupSets from './getOpetuksetByStudyGroupSets';
 import getLecturersByResponsibilityInfos from './getLecturersByResponsibilityInfos';
 
 class KurssiUpdater {
-  constructor({
-    courseUnitRealisation,
-    opintojakso,
-    models,
-    sisClient,
-    logger,
-    fallbackKurssiOmistaja,
-  }) {
+  constructor({ courseUnitRealisation, opintojakso, fallbackKurssiOmistaja }) {
     this.courseUnitRealisation = courseUnitRealisation;
     this.opintojakso = opintojakso;
-    this.models = models;
-    this.sisClient = sisClient;
-    this.logger = logger;
     this.fallbackKurssiOmistaja = fallbackKurssiOmistaja;
   }
 
   async update() {
-    const responsibilityInfos = await this.sisClient.getCourseUnitRealisationResponsibilityInfos(
+    const responsibilityInfos = await sisClient.getCourseUnitRealisationResponsibilityInfos(
       this.courseUnitRealisation.id,
     );
 
     const owner = getKurssiOmistajaByResponsibilityInfos(responsibilityInfos);
 
     const ownerHenkilo = owner
-      ? await this.models.Henkilo.query().findOneByPerson(owner)
+      ? await models.Henkilo.query().findOneByPerson(owner)
       : undefined;
 
     const baseKurssi = getKurssiByCourseUnitRealisation(
@@ -45,9 +38,9 @@ class KurssiUpdater {
         : this.fallbackKurssiOmistaja,
     };
 
-    await this.models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
+    await models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
 
-    this.kurssi = await this.models.Kurssi.query().findOne({
+    this.kurssi = await models.Kurssi.query().findOne({
       sisId: this.courseUnitRealisation.id,
     });
 
@@ -70,7 +63,7 @@ class KurssiUpdater {
 
   async updateOpetustehtavanHoitoForPerson(person, ryhmaNro, opetustehtava) {
     const henkilo = person
-      ? await this.models.Henkilo.findOneByPerson(person)
+      ? await models.Henkilo.findOneByPerson(person)
       : undefined;
 
     const {
@@ -106,7 +99,7 @@ class KurssiUpdater {
         opetustehtava,
       };
 
-      await this.models.OpetustehtavanHoito.query().patchOrInsertById(
+      await models.OpetustehtavanHoito.query().patchOrInsertById(
         opetustehtavanHoitoId,
         opetustehtavanHoito,
       );
@@ -128,7 +121,7 @@ class KurssiUpdater {
     if (this.kurssi.isExam()) {
       opetukset = [{ ryhmaNro: 1, ilmoJnro: 1, sisId }];
     } else {
-      const groupSets = await this.sisClient.getCourseUnitRealisationStudyGroupSets(
+      const groupSets = await sisClient.getCourseUnitRealisationStudyGroupSets(
         this.courseUnitRealisation.id,
       );
 
@@ -154,11 +147,11 @@ class KurssiUpdater {
       const { teacher, ...restOpetus } = opetus;
 
       await this.updateOpetus(restOpetus, teacher).catch((error) => {
-        this.logger.error('Failed to update study group', {
+        logger.error('Failed to update study group', {
           studyGroup: opetus,
         });
 
-        this.logger.error(error);
+        logger.error(error);
       });
     }
   }
@@ -182,7 +175,7 @@ class KurssiUpdater {
       ryhmaNro,
     ];
 
-    await this.models.Opetus.query().patchOrInsertById(opetusId, opetus);
+    await models.Opetus.query().patchOrInsertById(opetusId, opetus);
 
     await this.updateOpetustehtavanHoitoForPerson(teacher, ryhmaNro, 'HT');
   }

@@ -1,75 +1,24 @@
-import { isArray } from 'lodash';
+import axios from 'axios';
+import https from 'https';
 
-class SisClient {
-  constructor({ importerClient }) {
-    this.importerClient = importerClient;
-  }
+import SisClient from './sisClient';
+import SisImporterClient from './sisImporterClient';
+import { SIS_IMPORTER_API_TOKEN, SIS_IMPORTER_API_URL } from '../../config';
 
-  async getCourseUnits(options = {}) {
-    const { codes } = options;
+const importerHttpClient = axios.create({
+  baseURL: SIS_IMPORTER_API_URL,
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+  }),
+});
 
-    if (!isArray(codes) || codes.length === 0) {
-      // At the moment codes array is required
-      throw new Error('At least one course code is required');
-    }
+const importerClient = new SisImporterClient({
+  httpClient: importerHttpClient,
+  token: SIS_IMPORTER_API_TOKEN,
+});
 
-    const params = {
-      codes: codes.join(','),
-    };
+const sisClient = new SisClient({
+  importerClient,
+});
 
-    const { data } = await this.importerClient.get('/course_units', {
-      params,
-    });
-
-    return data;
-  }
-
-  getCourseUnitsByCodes(codes) {
-    return this.getCourseUnits({ codes });
-  }
-
-  async getCourseUnitsByProgramme(programme) {
-    if (!programme) {
-      throw new Error('Programme is required');
-    }
-
-    const { data } = await this.importerClient.get(
-      `/course_units/${programme}`,
-    );
-
-    return data && data.course_units ? data.course_units : [];
-  }
-
-  async getCourseUnitRealisationsByCode(code) {
-    if (!code) {
-      throw new Error('Course code is required');
-    }
-
-    const { data } = await this.importerClient.get(
-      '/course_unit_realisations',
-      {
-        params: { code },
-      },
-    );
-
-    return data;
-  }
-
-  async getCourseUnitRealisationResponsibilityInfos(id) {
-    const { data } = await this.importerClient.get(
-      `/course_unit_realisations/${id}/responsibility_infos`,
-    );
-
-    return data;
-  }
-
-  async getCourseUnitRealisationStudyGroupSets(id) {
-    const { data } = await this.importerClient.get(
-      `/course_unit_realisations/${id}/study_group_sets`,
-    );
-
-    return data;
-  }
-}
-
-export default SisClient;
+export default sisClient;
