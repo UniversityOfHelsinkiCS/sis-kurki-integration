@@ -25,11 +25,7 @@ export class KurkiUpdater {
   }
 
   async updateOpintojaksot(courseUnits) {
-    const courseUnitCodes = courseUnits.map(({ code }) => code);
-
-    logger.info(`Starting to update ${courseUnits.length} courses`, {
-      courseUnitCodes,
-    });
+    logger.info(`Starting to update ${courseUnits.length} courses`);
 
     for (let courseUnit of courseUnits) {
       await this.updateOpintojakso(courseUnit).catch((error) => {
@@ -43,7 +39,6 @@ export class KurkiUpdater {
 
     logger.info(
       `Done updating ${courseUnits.length} courses. Check logs for possible errors`,
-      { courseUnitCodes },
     );
   }
 
