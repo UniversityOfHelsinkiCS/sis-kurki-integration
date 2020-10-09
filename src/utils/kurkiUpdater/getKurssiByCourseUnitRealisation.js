@@ -1,6 +1,8 @@
 import { get } from 'lodash';
 import { getYear, isValid, getMonth, getDate } from 'date-fns';
 
+import getLastUrnPart from '../getLastUrnPart';
+
 const kielikoodiByLanguageCode = {
   fi: 'S',
   en: 'E',
@@ -68,8 +70,7 @@ const getKielikoodiByTeachingLanguageUrn = (teachingLanguageUrn) => {
     return undefined;
   }
 
-  const parts = teachingLanguageUrn.split(':');
-  const language = parts[parts.length - 1];
+  const language = getLastUrnPart(teachingLanguageUrn);
 
   return kielikoodiByLanguageCode[language] || 'E';
 };
@@ -81,8 +82,7 @@ const getTyyppiByCourseUnitRealisationTypeUrn = (
     return undefined;
   }
 
-  const parts = courseUnitRealisationTypeUrn.split(':');
-  const type = parts[parts.length - 1];
+  const type = getLastUrnPart(courseUnitRealisationTypeUrn);
 
   return tyyppiByCourseUnitRealisationType[type] || 'K';
 };

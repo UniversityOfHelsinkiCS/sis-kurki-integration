@@ -1,6 +1,10 @@
+import { get } from 'lodash';
+
 const group99RegExp = /(Group 99|Jono|Ryhmä 99)/i;
 
-const getIlmoJnroByStudyGroupName = (name) => {
+const getIlmoJnroByStudyGroup = (group) => {
+  const name = get(group, 'name.fi');
+
   if (!name) {
     return undefined;
   }
@@ -14,4 +18,4 @@ const getIlmoJnroByStudyGroupName = (name) => {
   return numberMatch && numberMatch[2] ? parseInt(numberMatch[2]) : undefined;
 };
 
-export default getIlmoJnroByStudyGroupName;
+export default getIlmoJnroByStudyGroup;

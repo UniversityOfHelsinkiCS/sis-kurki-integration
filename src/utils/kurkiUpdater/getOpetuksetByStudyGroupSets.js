@@ -1,41 +1,36 @@
-import { flatMap, isNumber, get } from 'lodash';
+import { flatMap, isNumber } from 'lodash';
 
-import getIlmoJnroByStudyGroupName from './getIlmoJnroByStudyGroupName';
+import getIlmoJnroByStudyGroup from './getIlmoJnroByStudyGroup';
+
+const getStudyGroupTeacher = (group) =>
+  group.teachers ? group.teachers[0] : undefined;
 
 const getOpetusByStudyGroupSets = (groupSets, kurssi) => {
   const { sisId } = kurssi;
   const groups = flatMap(groupSets, ({ studySubGroups }) => studySubGroups);
 
-  const group99 = groups.find(
-    ({ name }) => getIlmoJnroByStudyGroupName(get(name, 'fi')) === 99,
-  );
+  const group99 = groups.find((group) => getIlmoJnroByStudyGroup(group) === 99);
 
-  const validGroups = groups.filter(({ name }) => {
-    const ilmoJnro = getIlmoJnroByStudyGroupName(get(name, 'fi'));
+  const validGroups = groups.filter((group) => {
+    const ilmoJnro = getIlmoJnroByStudyGroup(group);
 
     return isNumber(ilmoJnro) && ilmoJnro !== 99;
   });
 
-  let opetus = validGroups.map((s, i) => {
+  let opetus = validGroups.map((group, i) => {
     return {
-      sisId: s.id,
+      sisId: group.id,
       ryhmaNro: i + 2,
-      ilmoJnro: getIlmoJnroByStudyGroupName(get(s.name, 'fi')),
-      teacher: s.teachers ? s.teachers[0] : undefined,
+      ilmoJnro: getIlmoJnroByStudyGroup(group),
+      teacher: getStudyGroupTeacher(group),
     };
   });
 
   if (group99) {
-    opetus = [
-      ...opetus,
-      { ryhmaNro: 1, ilmoJnro: 99, sisId: group99.id },
-    ];
+    opetus = [...opetus, { ryhmaNro: 1, ilmoJnro: 99, sisId: group99.id }];
   }
 
-  opetus = [
-    ...opetus,
-    { ryhmaNro: 0, ilmoJnro: null, sisId },
-  ];
+  opetus = [...opetus, { ryhmaNro: 0, ilmoJnro: null, sisId }];
 
   return opetus;
 };
