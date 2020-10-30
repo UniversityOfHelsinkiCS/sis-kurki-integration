@@ -40,9 +40,9 @@ class KurssiUpdater {
 
     await models.Kurssi.query().patchOrInsertWithKurssiNro(kurssi);
 
-    this.kurssi = await models.Kurssi.query().findOne({
-      sisId: this.courseUnitRealisation.id,
-    });
+    this.kurssi = await models.Kurssi.query().findBySisId(
+      this.courseUnitRealisation.id,
+    );
 
     await this.updateOpetukset();
 

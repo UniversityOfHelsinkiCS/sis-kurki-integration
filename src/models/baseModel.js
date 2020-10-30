@@ -18,6 +18,10 @@ export class QueryBuilder extends ObjectionQueryBuilder {
       }
     });
   }
+
+  findBySisId(id) {
+    return this.findOne({ sisId: id });
+  }
 }
 
 export class BaseModel extends Model {
