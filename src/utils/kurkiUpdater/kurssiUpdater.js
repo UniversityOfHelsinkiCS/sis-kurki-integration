@@ -1,12 +1,10 @@
-import { isNumber } from 'lodash';
-
 import models from '../../models';
 import logger from '../logger';
 import sisClient from '../sisClient';
 import getKurssiByCourseUnitRealisation from './getKurssiByCourseUnitRealisation';
 import getKurssiOmistajaByResponsibilityInfos from './getKurssiOmistajaByResponsibilityInfos';
-import getOpetuksetByStudyGroupSets from './getOpetuksetByStudyGroupSets';
 import getLecturersByResponsibilityInfos from './getLecturersByResponsibilityInfos';
+import getOpetuksetByKurssi from './getOpetuksetByKurssi';
 
 class KurssiUpdater {
   constructor({ courseUnitRealisation, opintojakso, fallbackKurssiOmistaja }) {
@@ -107,37 +105,7 @@ class KurssiUpdater {
   }
 
   async getOpetukset() {
-    const {
-      kurssikoodi,
-      lukukausi,
-      lukuvuosi,
-      tyyppi,
-      kurssiNro,
-      sisId,
-    } = this.kurssi;
-
-    let opetukset = [];
-
-    if (this.kurssi.isExam()) {
-      opetukset = [{ ryhmaNro: 1, ilmoJnro: 1, sisId }];
-    } else {
-      const groupSets = await sisClient.getCourseUnitRealisationStudyGroupSets(
-        this.courseUnitRealisation.id,
-      );
-
-      opetukset = getOpetuksetByStudyGroupSets(groupSets, this.kurssi);
-    }
-
-    return opetukset.map((opetus) => ({
-      ...opetus,
-      kurssikoodi,
-      lukukausi,
-      lukuvuosi,
-      tyyppi,
-      kurssiNro,
-      ilmo: 'K',
-      opetustehtava: isNumber(opetus.ilmoJnro) ? 'LH' : 'LU',
-    }));
+    return getOpetuksetByKurssi(this.kurssi);
   }
 
   async updateOpetukset() {

@@ -1,5 +1,3 @@
-import promiseMap from 'p-map';
-
 import models from '../../models';
 import logger from '../logger';
 import sisClient from '../sisClient';
@@ -33,20 +31,18 @@ class OpintojaksoUpdater {
       kurssikoodi,
     );
 
-    await promiseMap(
-      courseUnitRealisations,
-      (realisation) => {
-        return this.updateKurssi(realisation).catch((error) => {
-          logger.error('Failed to update course unit realisation', {
-            courseUnit: this.courseUnit,
-            courseUnitRealisation: realisation,
-          });
-
-          logger.error(error);
+    for (let realisation of courseUnitRealisations) {
+      try {
+        await this.updateKurssi(realisation);
+      } catch (error) {
+        logger.error('Failed to update course unit realisation', {
+          courseUnit: this.courseUnit,
+          courseUnitRealisation: realisation,
         });
-      },
-      { concurrency: 5, stopOnError: false },
-    );
+
+        logger.error(error);
+      }
+    }
   }
 
   async updateKurssi(courseUnitRealisation) {

@@ -15,6 +15,8 @@ const getIlmoJnroByStudyGroup = (group) => {
 
   const numberMatch = name.match(/^(\D*)(\d+)/);
 
+  console.log(name, numberMatch && numberMatch[2] ? parseInt(numberMatch[2]) : undefined)
+
   return numberMatch && numberMatch[2] ? parseInt(numberMatch[2]) : undefined;
 };
 

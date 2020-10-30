@@ -48,6 +48,8 @@ class EnhancedQueryBuilder extends QueryBuilder {
       );
 
       if (kurssiWithSameAlkamisPvm) {
+        console.log('same alkamis pvm, patching')
+
         await Model.query()
           .findById([
             kurssiWithSameAlkamisPvm.kurssikoodi,
@@ -61,11 +63,15 @@ class EnhancedQueryBuilder extends QueryBuilder {
         return true;
       }
 
+      console.log('simulatenous', simultaneousKurssit);
+
       const kurssiNro =
         simultaneousKurssit.length === 0
           ? 1
           : Math.max(...simultaneousKurssit.map(({ kurssiNro }) => kurssiNro)) +
             1;
+
+      console.log('inserting')
 
       await Model.query().insert({ ...kurssi, kurssiNro });
 
@@ -81,6 +87,10 @@ class Kurssi extends BaseModel {
 
   isExam() {
     return this.tyyppi === 'L';
+  }
+
+  isLab() {
+    return this.tyyppi === 'A';
   }
 
   static get idColumn() {
