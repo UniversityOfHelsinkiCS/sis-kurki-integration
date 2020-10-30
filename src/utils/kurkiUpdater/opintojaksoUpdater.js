@@ -32,16 +32,14 @@ class OpintojaksoUpdater {
     );
 
     for (let realisation of courseUnitRealisations) {
-      try {
-        await this.updateKurssi(realisation);
-      } catch (error) {
+      await this.updateKurssi(realisation).catch((error) => {
         logger.error('Failed to update course unit realisation', {
           courseUnit: this.courseUnit,
           courseUnitRealisation: realisation,
         });
 
         logger.error(error);
-      }
+      });
     }
   }
 
