@@ -69,14 +69,20 @@ docker exec -it sis-kurki-integration /bin/bash
 
 ## Todo
 
-- Add `SIS_ID` for `Kurssi` table in Kurki:
+- Add `SIS_ID` column for `Kurssi` table in Kurki:
 
 ```sql
 ALTER TABLE Kurssi ADD SIS_ID VARCHAR2(50) UNIQUE;
 ```
 
-- Add `SIS_ID` for `Opetus` table in Kurki:
+- Add `SIS_ID` column for `Opetus` table in Kurki:
 
 ```sql
 ALTER TABLE Opetus ADD SIS_ID VARCHAR2(50) UNIQUE;
+```
+
+- Add `SIS_ID` column for `Henkilo` table in Kurki:
+
+```sql
+ALTER TABLE Henkilo ADD SIS_ID VARCHAR2(50) UNIQUE;
 ```

@@ -23,7 +23,7 @@ class KurssiUpdater {
     const owner = getKurssiOmistajaByResponsibilityInfos(responsibilityInfos);
 
     const ownerHenkilo = owner
-      ? await models.Henkilo.query().findOneByPerson(owner)
+      ? await models.Henkilo.query().patchOrInsertAndFetchByPerson(owner)
       : undefined;
 
     const baseKurssi = getKurssiByCourseUnitRealisation(
@@ -63,7 +63,7 @@ class KurssiUpdater {
 
   async updateOpetustehtavanHoitoForPerson(person, ryhmaNro, opetustehtava) {
     const henkilo = person
-      ? await models.Henkilo.findOneByPerson(person)
+      ? await models.Henkilo.patchOrInsertAndFetchByPerson(person)
       : undefined;
 
     const {
