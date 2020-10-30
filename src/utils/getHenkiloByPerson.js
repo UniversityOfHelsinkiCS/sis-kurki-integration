@@ -1,13 +1,13 @@
 import getKtunnusByPerson from './getKtunnusByPerson';
 
 const getHenkiloByPerson = (person) => {
-  const { firstName, lastName, id } = person;
+  const { firstNames, lastName, id } = person;
 
   const ktunnus = getKtunnusByPerson(person);
 
   return {
     ktunnus,
-    etunimet: firstName,
+    etunimet: firstNames,
     sukunimi: lastName,
     sisId: id,
   };

@@ -63,7 +63,7 @@ class KurssiUpdater {
 
   async updateOpetustehtavanHoitoForPerson(person, ryhmaNro, opetustehtava) {
     const henkilo = person
-      ? await models.Henkilo.patchOrInsertAndFetchByPerson(person)
+      ? await models.Henkilo.query().patchOrInsertAndFetchByPerson(person)
       : undefined;
 
     const {
