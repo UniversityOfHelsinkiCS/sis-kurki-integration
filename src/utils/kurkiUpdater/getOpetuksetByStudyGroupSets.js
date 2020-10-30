@@ -1,4 +1,4 @@
-import { flatMap, isNumber } from 'lodash';
+import { flatMap } from 'lodash';
 
 import getIlmoJnroByStudyGroup from './getIlmoJnroByStudyGroup';
 
@@ -12,9 +12,7 @@ const getOpetusByStudyGroupSets = (groupSets, kurssi) => {
   const group99 = groups.find((group) => getIlmoJnroByStudyGroup(group) === 99);
 
   const validGroups = groups.filter((group) => {
-    const ilmoJnro = getIlmoJnroByStudyGroup(group);
-
-    return isNumber(ilmoJnro) && ilmoJnro !== 99;
+    return getIlmoJnroByStudyGroup(group) !== 99;
   });
 
   let opetus = validGroups.map((group, i) => {
