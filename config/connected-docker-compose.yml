@@ -5,8 +5,8 @@ version: "3.5"
 services:
   sis-kurki-integration:
     environment:
-      KURKI_DB_USER: tk_opha2
-      KURKI_DB_PASSWORD: oracle
+      KURKI_DB_USER: tk_opha
+      KURKI_DB_PASSWORD: salasana
       KURKI_DB_CONNECTION_STRING: kurki-db:1521/opetest2
       KURKI_FALLBACK_KURSSI_OMISTAJA: SIVEN_R
     networks:
