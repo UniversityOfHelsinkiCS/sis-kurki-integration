@@ -9,7 +9,7 @@ const getExamOpetukset = (kurssi) => {
   return [{ ryhmaNro: 1, ilmoJnro: 1, sisId }];
 };
 
-const getLabOpetukset = (kurssi, opetukset) => {
+const getDefaultOpetukset = (kurssi, opetukset) => {
   const { sisId } = kurssi;
 
   const group99 = opetukset.find(({ ilmoJnro }) => ilmoJnro === 99);
@@ -36,12 +36,14 @@ const getOpetuksetByKurssi = async (kurssi) => {
 
   const baseOpetukset = getOpetuksetByStudyGroupSets(groupSets, kurssi);
 
-  let opetukset = baseOpetukset;
+  let opetukset = [];
 
   if (kurssi.isExam()) {
     opetukset = getExamOpetukset(kurssi);
-  } else if (kurssi.isLab()) {
-    opetukset = getLabOpetukset(kurssi, baseOpetukset);
+  } else if (kurssi.isCourse()) {
+    opetukset = baseOpetukset;
+  } else {
+    opetukset = getDefaultOpetukset(kurssi, baseOpetukset);
   }
 
   return opetukset.map((opetus) => ({

@@ -63,15 +63,11 @@ class EnhancedQueryBuilder extends QueryBuilder {
         return true;
       }
 
-      console.log('simulatenous', simultaneousKurssit);
-
       const kurssiNro =
         simultaneousKurssit.length === 0
           ? 1
           : Math.max(...simultaneousKurssit.map(({ kurssiNro }) => kurssiNro)) +
             1;
-
-      console.log('inserting')
 
       await Model.query().insert({ ...kurssi, kurssiNro });
 
@@ -91,6 +87,10 @@ class Kurssi extends BaseModel {
 
   isLab() {
     return this.tyyppi === 'A';
+  }
+
+  isCourse() {
+    return this.tyyppi === 'K';
   }
 
   static get idColumn() {
