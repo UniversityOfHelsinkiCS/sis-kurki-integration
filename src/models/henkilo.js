@@ -23,7 +23,7 @@ class EnhancedQueryBuilder extends QueryBuilder {
 
       const nrUpdated = await Model.query().findOne({ ktunnus }).patch(henkilo);
 
-      if (nrUpdated === 1) {
+      if (nrUpdated >= 1) {
         return true;
       } else {
         await Model.query().insert({

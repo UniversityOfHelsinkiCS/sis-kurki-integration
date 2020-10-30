@@ -13,3 +13,5 @@ export const {
 export const DB_CONFIG = knexfile;
 
 export const CS_BACHELOR_PROGRAMME_CODE = '500-K005';
+
+export const COURSES_UPDATE_CRON = '0 */3 * * *';

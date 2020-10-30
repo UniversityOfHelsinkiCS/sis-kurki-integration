@@ -38,7 +38,7 @@ export class KurkiUpdater {
     }
 
     logger.info(
-      `Done updating ${courseUnits.length} courses. Check logs for possible errors`,
+      `Finished updating ${courseUnits.length} courses. Check logs for possible errors`,
     );
   }
 
