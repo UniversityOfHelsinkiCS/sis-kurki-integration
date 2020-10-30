@@ -10,7 +10,7 @@ KURKI_DB_PASSWORD=oracle
 KURKI_DB_CONNECTION_STRING=kurki-db:1521/xe
 KURKI_FALLBACK_KURSSI_OMISTAJA=DOE_J
 SIS_IMPORTER_API_TOKEN=<SIS_IMPORTER_API_TOKEN>
-SIS_IMPORTER_API_URL=https://oodikone-staging.cs.helsinki.fi/importer
+SIS_IMPORTER_API_URL=https://importer.cs.helsinki.fi
 ```
 
 You will need to request the value of the `SIS_IMPORTER_API_TOKEN` from Toska to be able to finish the development setup.
