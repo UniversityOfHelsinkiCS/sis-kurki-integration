@@ -34,7 +34,7 @@ class SisClient {
     }
 
     const { data } = await this.importerClient.get(
-      `/course_units/${programme}`,
+      `/course_units/programme/${programme}`,
     );
 
     return data && data.course_units ? data.course_units : [];
