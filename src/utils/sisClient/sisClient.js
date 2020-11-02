@@ -40,15 +40,24 @@ class SisClient {
     return data && data.course_units ? data.course_units : [];
   }
 
-  async getCourseUnitRealisationsByCode(code) {
+  async getCourseUnitRealisationsByCode(code, options = {}) {
     if (!code) {
       throw new Error('Course code is required');
     }
 
+    const { activityPeriodEndDateAfter } = options;
+
+    const params = {
+      code,
+      ...(activityPeriodEndDateAfter && {
+        activityPeriodEndDateAfter: activityPeriodEndDateAfter.toISOString(),
+      }),
+    };
+
     const { data } = await this.importerClient.get(
       '/course_unit_realisations',
       {
-        params: { code },
+        params,
       },
     );
 

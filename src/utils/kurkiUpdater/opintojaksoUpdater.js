@@ -1,3 +1,5 @@
+import { subMonths } from 'date-fns';
+
 import models from '../../models';
 import logger from '../logger';
 import sisClient from '../sisClient';
@@ -29,6 +31,7 @@ class OpintojaksoUpdater {
 
     const courseUnitRealisations = await sisClient.getCourseUnitRealisationsByCode(
       kurssikoodi,
+      { activityPeriodEndDateAfter: subMonths(new Date(), 12) },
     );
 
     for (let realisation of courseUnitRealisations) {
