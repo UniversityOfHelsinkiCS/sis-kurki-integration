@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 
 const group99RegExp = /(Group 99|Jono|Ryhmä 99)/i;
 
@@ -15,7 +15,10 @@ const getIlmoJnroByStudyGroup = (group) => {
 
   const numberMatch = name.match(/^(\D*)(\d+)/);
 
-  return numberMatch && numberMatch[2] ? parseInt(numberMatch[2]) : undefined;
+  const maybeNumber =
+    numberMatch && numberMatch[2] ? parseInt(numberMatch[2]) : undefined;
+
+  return isNumber(maybeNumber) && maybeNumber < 100 ? maybeNumber : undefined;
 };
 
 export default getIlmoJnroByStudyGroup;
